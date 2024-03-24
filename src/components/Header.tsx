@@ -4,7 +4,7 @@ const Header = () => {
 	return (
 		<header className='h-14 border-b bg-gray-50'>
 			<div className='container flex h-full items-center justify-between'>
-				<p>DRIVE (CE)</p>
+				<p className='font-semibold'>DRIVE (CE)</p>
 
 				<div className='flex items-center gap-7'>
 					<div className='h-8'>
