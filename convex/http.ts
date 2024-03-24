@@ -30,7 +30,7 @@ http.route({
 					await ctx.runMutation(internal.users.create, {
 						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.id}`,
 						name: generateName(result.data.first_name, result.data.last_name),
-						image_url: result.data.image_url,
+						imageUrl: result.data.image_url,
 					});
 					break;
 				case 'organizationMembership.created':

@@ -14,13 +14,23 @@ export const hasAccessToOrg = async (
 	}
 
 	const user = await getUser(ctx, identity.tokenIdentifier);
-
 	return user.orgIds.includes(orgId) || user.tokenIdentifier.includes(orgId);
 };
+
+export const generateUploadUrl = mutation(async (ctx) => {
+	const identity = await ctx.auth.getUserIdentity();
+
+	if (!identity) {
+		throw new ConvexError('Unauthorized');
+	}
+
+	return await ctx.storage.generateUploadUrl();
+});
 
 export const create = mutation({
 	args: {
 		label: v.string(),
+		fileId: v.id('_storage'),
 		orgId: v.string(),
 	},
 	async handler(ctx, args) {
@@ -30,7 +40,8 @@ export const create = mutation({
 			throw new ConvexError('Unauthorized');
 		}
 
-		if (!(await hasAccessToOrg(ctx, args.orgId))) {
+		const hasRight = await hasAccessToOrg(ctx, args.orgId);
+		if (!hasRight) {
 			throw new ConvexError('You do not have access to this organization');
 		}
 
@@ -49,7 +60,8 @@ export const find = query({
 			throw new ConvexError('Unauthorized');
 		}
 
-		if (!(await hasAccessToOrg(ctx, args.orgId))) {
+		const hasRight = await hasAccessToOrg(ctx, args.orgId);
+		if (!hasRight) {
 			return [];
 		}
 
