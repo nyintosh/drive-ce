@@ -11,6 +11,7 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@convex/_generated/api';
 
+import FileCard from '@/components/FileCard';
 import UploadFileModal from '@/components/UploadFileModal';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +20,7 @@ const Home = () => {
 	const { user } = useUser();
 
 	const orgId = organization?.id ?? user?.id;
-	const files = useQuery(api.files.find, orgId ? { orgId } : 'skip');
+	const files = useQuery(api.files.findAll, orgId ? { orgId } : 'skip');
 
 	return (
 		<main className='container mx-auto pt-12'>
@@ -35,12 +36,8 @@ const Home = () => {
 					{orgId ? <UploadFileModal orgId={orgId} /> : null}
 				</div>
 
-				<div className='pt-6'>
-					{files?.map((file) => (
-						<div key={file._id}>
-							<p className='font-mono'>{file.label}</p>
-						</div>
-					))}
+				<div className='grid grid-cols-4 gap-3 pt-6'>
+					{files?.map((file) => <FileCard key={file._id} file={file} />)}
 				</div>
 			</SignedIn>
 		</main>

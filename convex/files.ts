@@ -8,7 +8,6 @@ export const hasAccessToOrg = async (
 	orgId: string,
 ) => {
 	const identity = await ctx.auth.getUserIdentity();
-
 	if (!identity) {
 		throw new ConvexError('Unauthorized');
 	}
@@ -19,7 +18,6 @@ export const hasAccessToOrg = async (
 
 export const generateUploadUrl = mutation(async (ctx) => {
 	const identity = await ctx.auth.getUserIdentity();
-
 	if (!identity) {
 		throw new ConvexError('Unauthorized');
 	}
@@ -27,7 +25,7 @@ export const generateUploadUrl = mutation(async (ctx) => {
 	return await ctx.storage.generateUploadUrl();
 });
 
-export const create = mutation({
+export const createFile = mutation({
 	args: {
 		label: v.string(),
 		fileId: v.id('_storage'),
@@ -35,7 +33,6 @@ export const create = mutation({
 	},
 	async handler(ctx, args) {
 		const identity = await ctx.auth.getUserIdentity();
-
 		if (!identity) {
 			throw new ConvexError('Unauthorized');
 		}
@@ -49,13 +46,12 @@ export const create = mutation({
 	},
 });
 
-export const find = query({
+export const findAll = query({
 	args: {
 		orgId: v.string(),
 	},
 	async handler(ctx, args) {
 		const identity = await ctx.auth.getUserIdentity();
-
 		if (!identity) {
 			throw new ConvexError('Unauthorized');
 		}
@@ -69,5 +65,29 @@ export const find = query({
 			.query('files')
 			.withIndex('by_org_id', (q) => q.eq('orgId', args.orgId))
 			.collect();
+	},
+});
+
+export const deleteFile = mutation({
+	args: {
+		fileId: v.id('files'),
+	},
+	async handler(ctx, args) {
+		const identity = await ctx.auth.getUserIdentity();
+		if (!identity) {
+			throw new ConvexError('Unauthorized');
+		}
+
+		const file = await ctx.db.get(args.fileId);
+		if (!file) {
+			throw new ConvexError('File not found');
+		}
+
+		const hasRight = await hasAccessToOrg(ctx, file.orgId);
+		if (!hasRight) {
+			throw new ConvexError('You do not have access to this organization');
+		}
+
+		await ctx.db.delete(args.fileId);
 	},
 });

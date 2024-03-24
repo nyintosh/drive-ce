@@ -59,10 +59,8 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 	});
 	const fileRef = form.register('file');
 
-	const generateUploadUrl = useMutation<typeof api.files.generateUploadUrl>(
-		api.files.generateUploadUrl,
-	);
-	const createFile = useMutation<typeof api.files.create>(api.files.create);
+	const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+	const createFile = useMutation(api.files.createFile);
 
 	const handleFileChange = (files: FileList | null) => {
 		const selectedFile = files?.[0];
@@ -73,28 +71,31 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 		}
 	};
 
-	const handleFileUpload = async (values: z.infer<typeof formSchema>) => {
-		try {
-			setIsUploading(!!1);
+	const handleFileUpload = (values: z.infer<typeof formSchema>) => {
+		toast.promise(
+			async () => {
+				setIsUploading(true);
 
-			const postUrl = await generateUploadUrl();
-			const result = await fetch(postUrl, {
-				method: 'POST',
-				headers: { 'Content-Type': values.file[0].type },
-				body: values.file[0],
-			});
+				const postUrl = await generateUploadUrl();
+				const result = await fetch(postUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': values.file[0].type },
+					body: values.file[0],
+				});
 
-			const { storageId } = await result.json();
-			await createFile({ label: values.label, fileId: storageId, orgId });
-
-			toast.success('File uploaded successfully');
-		} catch (error) {
-			console.log(error);
-			toast.error('Failed to upload file');
-		} finally {
-			setIsUploading(!!0);
-			setIsModalOpen(!!0);
-		}
+				const { storageId } = await result.json();
+				await createFile({ label: values.label, fileId: storageId, orgId });
+			},
+			{
+				loading: 'Uploading file...',
+				success: 'File uploaded',
+				error: 'Error uploading file',
+				finally: () => {
+					setIsUploading(false);
+					setIsModalOpen(false);
+				},
+			},
+		);
 	};
 
 	return (
@@ -107,7 +108,7 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 		>
 			<DialogTrigger asChild>
 				<Button className='flex items-center gap-2 pl-3 pr-4'>
-					<CloudUpload className='min-w-3' size={16} /> File upload
+					<CloudUpload className='min-w-4' size={16} /> File upload
 				</Button>
 			</DialogTrigger>
 
