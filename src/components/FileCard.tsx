@@ -73,14 +73,14 @@ const FileAction = ({ file }: FileCardProps) => {
 
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<EllipsisVertical className='min-w-4' size={16} />
+					<EllipsisVertical className='aspect-square min-w-4' size={16} />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem
 						onClick={() => setIsConfirmDialogOpen(true)}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
 					>
-						<Trash2 className='min-w-4' size={16} /> Delete
+						<Trash2 className='aspect-square min-w-4' size={16} /> Delete
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

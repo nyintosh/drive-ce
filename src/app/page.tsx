@@ -8,6 +8,7 @@ import {
 	useUser,
 } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 import { api } from '@convex/_generated/api';
@@ -32,7 +33,12 @@ const Home = () => {
 			</SignedOut>
 
 			<SignedIn>
-				{files && files.length > 0 ? (
+				{files === undefined ? (
+					<div className='mt-[30vh] flex flex-col items-center justify-center gap-1 text-gray-500'>
+						<Loader2 className='aspect-square min-w-4 animate-spin' size={16} />
+						<p className='text-sm'>Loading...</p>
+					</div>
+				) : files.length > 0 ? (
 					<>
 						<div className='flex items-center justify-between'>
 							<h1 className='text-4xl font-bold'>Your Files</h1>

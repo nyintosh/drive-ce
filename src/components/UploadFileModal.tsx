@@ -108,7 +108,8 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 		>
 			<DialogTrigger asChild>
 				<Button className='flex items-center gap-2 pl-3 pr-4'>
-					<CloudUpload className='min-w-4' size={16} /> File upload
+					<CloudUpload className='aspect-square min-w-4' size={16} /> File
+					upload
 				</Button>
 			</DialogTrigger>
 
