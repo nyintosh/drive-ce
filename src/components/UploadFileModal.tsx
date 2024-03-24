@@ -5,6 +5,7 @@ import { useMutation } from 'convex/react';
 import { CloudUpload, Loader2 } from 'lucide-react';
 import { ChangeEvent, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { api } from '@convex/_generated/api';
@@ -27,7 +28,6 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 
 const formSchema = z.object({
 	label: z
@@ -38,7 +38,7 @@ const formSchema = z.object({
 		.max(200, {
 			message: 'File name cannot be longer than 200 characters',
 		}),
-	file: z.instanceof(FileList).refine((files) => files.length > 0, {
+	file: z.any().refine((files) => files.length > 0, {
 		message: 'You need to select a file',
 	}),
 });
