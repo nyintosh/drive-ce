@@ -28,6 +28,7 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { getFileFormat } from '@/utils/get-file-format';
 
 const formSchema = z.object({
 	label: z
@@ -66,7 +67,12 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 		const selectedFile = files?.[0];
 
 		if (selectedFile) {
-			form.setValue('label', selectedFile.name);
+			form.setValue(
+				'label',
+				selectedFile.name.lastIndexOf('.') > 0
+					? selectedFile.name.substring(0, selectedFile.name.lastIndexOf('.'))
+					: selectedFile.name,
+			);
 			form.trigger('label');
 		}
 	};
@@ -76,15 +82,22 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 			async () => {
 				setIsUploading(true);
 
+				const fileType = values.file[0].type;
+
 				const postUrl = await generateUploadUrl();
 				const result = await fetch(postUrl, {
 					method: 'POST',
-					headers: { 'Content-Type': values.file[0].type },
+					headers: { 'Content-Type': fileType },
 					body: values.file[0],
 				});
 
 				const { storageId } = await result.json();
-				await createFile({ label: values.label, fileId: storageId, orgId });
+				await createFile({
+					label: values.label,
+					fileId: storageId,
+					type: getFileFormat(fileType),
+					orgId,
+				});
 			},
 			{
 				loading: 'Uploading file...',

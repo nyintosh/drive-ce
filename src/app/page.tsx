@@ -45,7 +45,7 @@ const Home = () => {
 							{orgId ? <UploadFileModal orgId={orgId} /> : null}
 						</div>
 
-						<div className='grid grid-cols-4 gap-3 pt-6'>
+						<div className='grid grid-cols-4 gap-4 pt-6'>
 							{files.map((file) => (
 								<FileCard key={file._id} file={file} />
 							))}
