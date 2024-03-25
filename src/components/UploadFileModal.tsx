@@ -94,7 +94,7 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 				const { storageId } = await result.json();
 				await createFile({
 					label: values.label,
-					fileId: storageId,
+					storageId,
 					type: getFileFormat(fileType),
 					orgId,
 				});

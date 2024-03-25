@@ -26,7 +26,7 @@ export const FileTypes = v.union(
 export default defineSchema({
 	files: defineTable({
 		label: v.string(),
-		fileId: v.id('_storage'),
+		storageId: v.id('_storage'),
 		type: FileTypes,
 		orgId: v.string(),
 	}).index('by_org_id', ['orgId']),

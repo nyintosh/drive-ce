@@ -29,7 +29,7 @@ export const generateUploadUrl = mutation(async (ctx) => {
 export const createFile = mutation({
 	args: {
 		label: v.string(),
-		fileId: v.id('_storage'),
+		storageId: v.id('_storage'),
 		type: FileTypes,
 		orgId: v.string(),
 	},
