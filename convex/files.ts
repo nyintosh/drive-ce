@@ -32,6 +32,7 @@ export const createFile = mutation({
 		storageId: v.id('_storage'),
 		type: FileTypes,
 		orgId: v.string(),
+		authorId: v.string(),
 	},
 	async handler(ctx, args) {
 		const identity = await ctx.auth.getUserIdentity();
@@ -63,10 +64,17 @@ export const findAll = query({
 			return [];
 		}
 
-		return await ctx.db
+		const files = await ctx.db
 			.query('files')
 			.withIndex('by_org_id', (q) => q.eq('orgId', args.orgId))
 			.collect();
+
+		return Promise.all(
+			files.map(async (file) => ({
+				...file,
+				url: await ctx.storage.getUrl(file.storageId),
+			})),
+		);
 	},
 });
 

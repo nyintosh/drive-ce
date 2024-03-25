@@ -1,5 +1,6 @@
 'use client';
 
+import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { CloudUpload, Loader2 } from 'lucide-react';
@@ -52,6 +53,8 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
+	const { user } = useUser();
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -80,6 +83,10 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 	const handleFileUpload = (values: z.infer<typeof formSchema>) => {
 		toast.promise(
 			async () => {
+				if (!user) {
+					throw new Error('Unauthorized');
+				}
+
 				setIsUploading(true);
 
 				const fileType = values.file[0].type;
@@ -97,6 +104,7 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 					storageId,
 					type: getFileFormat(fileType),
 					orgId,
+					authorId: user.id,
 				});
 			},
 			{

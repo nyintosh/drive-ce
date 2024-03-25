@@ -1,11 +1,16 @@
-import { useMutation } from 'convex/react';
-import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { useMutation, useQuery } from 'convex/react';
+import { EllipsisVertical, ExternalLink, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { api } from '@convex/_generated/api';
-import { Doc, Id } from '@convex/_generated/dataModel';
+import { Doc } from '@convex/_generated/dataModel';
 
+import { formatDateOrTimeAgo } from '@/lib/formatDateOrTimeAgo';
+import { cn } from '@/lib/utils';
+
+import { Icons } from './Icons';
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,24 +20,21 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from './ui/alert-dialog';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from '@/components/ui/card';
+} from './ui/card';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-
-import { Icons } from './Icons';
+} from './ui/dropdown-menu';
 
 const fileIcons = {
 	audio: (className?: string) => (
@@ -132,42 +134,58 @@ const fileIcons = {
 	),
 };
 
-const getFileUrl = (storageId: Id<'_storage'>) => {
-	return `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${storageId}`;
-};
-
 type FileCardProps = {
-	file: Doc<'files'>;
+	file: Doc<'files'> & {
+		url: string | null;
+	};
 };
 
-const FileCard = ({ file }: FileCardProps) => (
-	<Card>
-		<CardHeader>
-			<CardTitle className='flex w-full items-center justify-between'>
-				<span className='flex items-center gap-2'>
-					{fileIcons[file.type]()}{' '}
-					<span className='line-clamp-1'>{file.label}</span>
-				</span>{' '}
-				<FileAction file={file} />
-			</CardTitle>
-		</CardHeader>
-		<CardContent>
-			<div className='grid aspect-[2/1] h-auto w-full place-items-center'>
-				{fileIcons[file.type]('scale-[300%]')}
-			</div>
-		</CardContent>
-		<CardFooter>
-			<Button
-				onClick={() => {
-					window.open(getFileUrl(file.storageId), '_blank');
-				}}
-				variant='outline'
-			>
-				Download
-			</Button>
-		</CardFooter>
-	</Card>
-);
+const FileCard = ({ file }: FileCardProps) => {
+	const user = useQuery(api.users.getUserById, { id: file.authorId });
+
+	return (
+		<Card>
+			<CardHeader className='p-4'>
+				<CardTitle className='flex w-full items-center justify-between'>
+					<span className='flex items-center gap-2'>
+						{fileIcons[file.type]()}{' '}
+						<span className='line-clamp-1 text-sm text-gray-600'>
+							{file.label}
+						</span>
+					</span>{' '}
+					<FileAction file={file} />
+				</CardTitle>
+			</CardHeader>
+			<CardContent className='p-4 pt-0'>
+				{file.type === 'image' && file.url ? (
+					<Image
+						className='aspect-video h-auto w-full rounded-md object-cover'
+						src={file.url}
+						alt={file.label}
+						width={200}
+						height={100}
+					/>
+				) : (
+					<div className='grid aspect-video h-auto w-full place-items-center'>
+						{fileIcons[file.type]('scale-[300%]')}
+					</div>
+				)}
+			</CardContent>
+			<CardFooter className='p-4 pt-0'>
+				<p className='flex items-center gap-3'>
+					<Avatar className='h-6 w-6'>
+						<AvatarImage src={user?.imageUrl} alt={user?.name} />
+						<AvatarFallback>{user?.name[0]}</AvatarFallback>
+					</Avatar>
+					<span>•</span>
+					<span className='line-clamp-1 text-xs'>
+						{formatDateOrTimeAgo(new Date(file._creationTime))}
+					</span>
+				</p>
+			</CardFooter>
+		</Card>
+	);
+};
 
 export default FileCard;
 
@@ -218,6 +236,15 @@ const FileAction = ({ file }: FileCardProps) => {
 					<EllipsisVertical className='aspect-square min-w-4' size={16} />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
+					<DropdownMenuItem
+						onClick={() => {
+							if (!file.url) return;
+							window.open(file.url, '_blank');
+						}}
+						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
+					>
+						<ExternalLink className='aspect-square min-w-4' size={16} /> Open
+					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => setIsConfirmDialogOpen(true)}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'

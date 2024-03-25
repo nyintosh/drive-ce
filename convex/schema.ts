@@ -29,6 +29,7 @@ export default defineSchema({
 		storageId: v.id('_storage'),
 		type: FileTypes,
 		orgId: v.string(),
+		authorId: v.string(),
 	}).index('by_org_id', ['orgId']),
 	users: defineTable({
 		tokenIdentifier: v.string(),

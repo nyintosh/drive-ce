@@ -1,6 +1,11 @@
 import { ConvexError, v } from 'convex/values';
 
-import { MutationCtx, QueryCtx, internalMutation } from './_generated/server';
+import {
+	MutationCtx,
+	QueryCtx,
+	internalMutation,
+	query,
+} from './_generated/server';
 
 export const getUser = async (
 	ctx: QueryCtx | MutationCtx,
@@ -45,5 +50,28 @@ export const addOrgIdToUser = internalMutation({
 		await ctx.db.patch(user._id, {
 			orgIds: [...user.orgIds, orgId],
 		});
+	},
+});
+
+export const getUserById = query({
+	args: {
+		id: v.string(),
+	},
+	async handler(ctx, args) {
+		const user = await ctx.db
+			.query('users')
+			.withIndex('by_token_identifier', (q) =>
+				q.eq(
+					'tokenIdentifier',
+					`https://lasting-troll-75.clerk.accounts.dev|${args.id}`,
+				),
+			)
+			.first();
+
+		if (!user) {
+			throw new ConvexError('User not found');
+		}
+
+		return user;
 	},
 });
