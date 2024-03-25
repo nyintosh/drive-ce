@@ -166,12 +166,23 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 									type='submit'
 									disabled={isUploading}
 								>
-									{isUploading ? (
-										<Loader2 className='max-w-4 animate-spin' size={16} />
+									{!isUploading ? (
+										<>
+											<CloudUpload
+												className='aspect-square min-w-4'
+												size={16}
+											/>
+											Upload
+										</>
 									) : (
-										<CloudUpload className='max-w-4' size={16} />
+										<>
+											<Loader2
+												className='aspect-square min-w-4 animate-spin'
+												size={16}
+											/>
+											Uploading...
+										</>
 									)}
-									Upload
 								</Button>
 							</form>
 						</Form>
