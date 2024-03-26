@@ -98,6 +98,10 @@ export const deleteFile = mutation({
 			throw new ConvexError('You do not have access to this organization');
 		}
 
+		if (file.authorId !== identity.tokenIdentifier.split('|')[1]) {
+			throw new ConvexError('You do not have access to this file');
+		}
+
 		await ctx.db.delete(args.fileId);
 	},
 });
