@@ -4,7 +4,7 @@ import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from 'convex/react';
 import { CloudUpload, Loader2 } from 'lucide-react';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, PropsWithChildren, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -29,27 +29,33 @@ import {
 	FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { getFileFormat } from '@/utils/get-file-format';
 
 const formSchema = z.object({
 	label: z
 		.string()
 		.min(2, {
-			message: 'File name must contain at least 2 character(s)',
+			message: 'Name must contain at least 2 character(s)',
 		})
 		.max(200, {
-			message: 'File name cannot be longer than 200 characters',
+			message: 'Name cannot be longer than 200 characters',
 		}),
 	file: z.any().refine((files) => files.length > 0, {
 		message: 'You need to select a file',
 	}),
 });
 
-type UploadFileModalProps = {
+type UploadFileModalProps = PropsWithChildren & {
 	orgId: string;
+	className?: string;
 };
 
-const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
+const UploadFileModal = ({
+	children,
+	orgId,
+	className,
+}: UploadFileModalProps) => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -128,9 +134,8 @@ const UploadFileModal = ({ orgId }: UploadFileModalProps) => {
 			open={isModalOpen}
 		>
 			<DialogTrigger asChild>
-				<Button className='flex items-center gap-2 pl-3 pr-4'>
-					<CloudUpload className='aspect-square min-w-4' size={16} /> File
-					upload
+				<Button className={cn('flex items-center gap-2 pl-3 pr-4', className)}>
+					{children}
 				</Button>
 			</DialogTrigger>
 

@@ -186,7 +186,9 @@ const FileCard = ({ file }: FileCardProps) => {
 							<AvatarImage src={author?.imageUrl} alt={author?.name} />
 							<AvatarFallback>{author?.name[0]}</AvatarFallback>
 						</Avatar>
-						<span>{isAuthor ? 'You' : author?.name}</span>
+						<span className='line-clamp-1'>
+							{isAuthor ? 'You' : author?.name}
+						</span>
 					</div>
 					<span>•</span>
 					<span className='line-clamp-1'>

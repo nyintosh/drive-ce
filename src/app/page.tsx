@@ -8,66 +8,108 @@ import {
 	useUser,
 } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
-import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
+import { HardDriveUpload } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { api } from '@convex/_generated/api';
 
 import FileCard from '@/components/FileCard';
+import Loader from '@/components/Loader';
+import NoFilePlaceholder from '@/components/NoFilePlaceholder';
+import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
+import SearchBar from '@/components/SearchBar';
 import UploadFileModal from '@/components/UploadFileModal';
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
+	const [searchQuery, setSearchQuery] = useState('');
+
 	const { organization } = useOrganization();
 	const { user } = useUser();
 
 	const orgId = organization?.id ?? user?.id;
-	const files = useQuery(api.files.findAll, orgId ? { orgId } : 'skip');
+	const files = useQuery(
+		api.files.findAll,
+		orgId ? { orgId, query: searchQuery } : 'skip',
+	);
+
+	useEffect(() => {
+		setSearchQuery('');
+	}, [orgId]);
 
 	return (
-		<main className='container mx-auto pt-12'>
+		<main className='container relative mx-auto h-[calc(100vh-3.5rem)] overflow-y-auto'>
 			<SignedOut>
 				<SignInButton>
-					<Button variant='outline'>Sign In</Button>
+					<Button className='mt-8' variant='outline'>
+						Sign In
+					</Button>
 				</SignInButton>
 			</SignedOut>
 
 			<SignedIn>
-				{files === undefined ? (
-					<div className='mt-[30vh] flex flex-col items-center justify-center gap-1 text-gray-500'>
-						<Loader2 className='aspect-square min-w-4 animate-spin' size={16} />
-						<p className='text-sm'>Loading...</p>
-					</div>
-				) : files.length > 0 ? (
-					<>
-						<div className='flex items-center justify-between'>
-							<h1 className='text-4xl font-bold'>Your Files</h1>
-							{orgId ? <UploadFileModal orgId={orgId} /> : null}
+				{!searchQuery ? (
+					files === undefined ? (
+						<Loader />
+					) : files.length === 0 ? (
+						<div className='flex flex-col items-center justify-center gap-6 pt-24'>
+							{orgId ? <NoFilePlaceholder orgId={orgId} /> : null}
 						</div>
+					) : (
+						<>
+							<div className='sticky top-0 z-50 flex w-full items-center justify-between pt-8'>
+								<SearchBar
+									setQuery={setSearchQuery}
+									query={searchQuery}
+									pending={files === undefined}
+								/>
 
-						<div className='grid grid-cols-4 gap-4 pt-6'>
-							{files.map((file) => (
-								<FileCard key={file._id} file={file} />
-							))}
-						</div>
-					</>
+								{orgId ? (
+									<UploadFileModal orgId={orgId}>
+										<HardDriveUpload
+											className='aspect-square min-w-4'
+											size={16}
+										/>
+										Upload
+									</UploadFileModal>
+								) : null}
+							</div>
+
+							<div className='grid grid-cols-4 gap-3 pb-16 pt-6'>
+								{files?.map((file) => <FileCard key={file._id} file={file} />)}
+							</div>
+						</>
+					)
 				) : (
-					<div className='mt-12 flex flex-col items-center justify-center gap-6'>
-						<Image
-							className='grid-cols-4'
-							src='/undraw_upload_re_pasx.svg'
-							alt='an image of people uploading files'
-							width={400}
-							height={400}
-						/>
+					<>
+						<div className='sticky top-0 z-50 flex w-full items-center justify-between pt-8'>
+							<SearchBar
+								setQuery={setSearchQuery}
+								query={searchQuery}
+								pending={files === undefined}
+							/>
 
-						<p className='text-lg text-gray-400'>
-							Looks like this space could use some company! Time to spice things
-							up with some files!
-						</p>
+							{orgId ? (
+								<UploadFileModal orgId={orgId}>
+									<HardDriveUpload
+										className='aspect-square min-w-4'
+										size={16}
+									/>
+									Upload
+								</UploadFileModal>
+							) : null}
+						</div>
 
-						{orgId ? <UploadFileModal orgId={orgId} /> : null}
-					</div>
+						{files === undefined ? (
+							<Loader />
+						) : files.length === 0 || true ? (
+							<NotFoundPlaceholder />
+						) : (
+							<div className='grid grid-cols-4 gap-3 pb-16 pt-6'>
+								{files?.map((file) => <FileCard key={file._id} file={file} />)}
+							</div>
+						)}
+					</>
 				)}
 			</SignedIn>
 		</main>
