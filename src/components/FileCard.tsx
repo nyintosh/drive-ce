@@ -1,3 +1,4 @@
+import { useUser } from '@clerk/nextjs';
 import { useMutation, useQuery } from 'convex/react';
 import { EllipsisVertical, ExternalLink, Trash2 } from 'lucide-react';
 import Image from 'next/image';
@@ -39,97 +40,97 @@ import {
 const fileIcons = {
 	audio: (className?: string) => (
 		<Icons.fileAudio
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	bin: (className?: string) => (
 		<Icons.fileBin
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	csv: (className?: string) => (
 		<Icons.fileCsv
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	doc: (className?: string) => (
 		<Icons.fileDoc
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	docx: (className?: string) => (
 		<Icons.fileDocx
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	html: (className?: string) => (
 		<Icons.fileHtml
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	image: (className?: string) => (
 		<Icons.fileImage
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	json: (className?: string) => (
 		<Icons.fileJson
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	pdf: (className?: string) => (
 		<Icons.filePdf
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	ppt: (className?: string) => (
 		<Icons.fileSlides
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	pptx: (className?: string) => (
 		<Icons.fileSlides
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	rar: (className?: string) => (
 		<Icons.fileZip
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	txt: (className?: string) => (
 		<Icons.fileTxt
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	video: (className?: string) => (
 		<Icons.fileVideo
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	xls: (className?: string) => (
 		<Icons.fileXls
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	xlsx: (className?: string) => (
 		<Icons.fileXlsx
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	xml: (className?: string) => (
 		<Icons.fileXml
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	zip: (className?: string) => (
 		<Icons.fileZip
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 	other: (className?: string) => (
 		<Icons.file
-			className={cn(`aspect-square w-4 cursor-none select-none`, className)}
+			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
 		/>
 	),
 };
@@ -141,18 +142,20 @@ type FileCardProps = {
 };
 
 const FileCard = ({ file }: FileCardProps) => {
-	const user = useQuery(api.users.getUserById, { id: file.authorId });
+	const { user } = useUser();
+
+	const author = useQuery(api.users.getUserById, { id: file.authorId });
 
 	return (
 		<Card>
 			<CardHeader className='p-4'>
-				<CardTitle className='flex w-full items-center justify-between'>
-					<span className='flex items-center gap-2'>
+				<CardTitle className='flex items-center justify-between'>
+					<span className='flex w-[calc(100%-1.25rem)] items-center gap-2'>
 						{fileIcons[file.type]()}{' '}
 						<span className='line-clamp-1 text-sm text-gray-600'>
 							{file.label}
 						</span>
-					</span>{' '}
+					</span>
 					<FileAction file={file} />
 				</CardTitle>
 			</CardHeader>
@@ -166,19 +169,25 @@ const FileCard = ({ file }: FileCardProps) => {
 						height={100}
 					/>
 				) : (
-					<div className='grid aspect-video h-auto w-full place-items-center'>
-						{fileIcons[file.type]('scale-[300%]')}
+					<div className='flex aspect-video h-auto w-full flex-col items-center justify-center gap-2'>
+						{fileIcons[file.type]('scale-[200%]')}
+						<span className='text-xs text-[#888888]'>
+							{file.type.toUpperCase()}
+						</span>
 					</div>
 				)}
 			</CardContent>
 			<CardFooter className='p-4 pt-0'>
-				<p className='flex items-center gap-3'>
-					<Avatar className='h-6 w-6'>
-						<AvatarImage src={user?.imageUrl} alt={user?.name} />
-						<AvatarFallback>{user?.name[0]}</AvatarFallback>
-					</Avatar>
+				<p className='flex items-center gap-2 text-xs'>
+					<div className='flex items-center gap-2'>
+						<Avatar className='h-5 w-5'>
+							<AvatarImage src={author?.imageUrl} alt={author?.name} />
+							<AvatarFallback>{author?.name[0]}</AvatarFallback>
+						</Avatar>
+						<span>{file.authorId === user?.id ? 'You' : author?.name}</span>
+					</div>
 					<span>•</span>
-					<span className='line-clamp-1 text-xs'>
+					<span className='line-clamp-1'>
 						{formatDateOrTimeAgo(new Date(file._creationTime))}
 					</span>
 				</p>
