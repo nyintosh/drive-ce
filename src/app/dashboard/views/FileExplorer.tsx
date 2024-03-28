@@ -9,6 +9,7 @@ import { api } from '@convex/_generated/api';
 
 import FileCard from '@/components/FileCard';
 import Loader from '@/components/Loader';
+import NoFavoritePlaceholder from '@/components/NoFavoritePlaceholder';
 import NoFilePlaceholder from '@/components/NoFilePlaceholder';
 import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
 import SearchBar from '@/components/SearchBar';
@@ -41,7 +42,13 @@ const FileExplorer = ({ isFavorite }: FileExplorerTypes) => {
 					<Loader />
 				) : files.length === 0 ? (
 					<div className='flex flex-col items-center justify-center gap-6 pt-24'>
-						{orgId ? <NoFilePlaceholder orgId={orgId} /> : null}
+						{orgId ? (
+							isFavorite ? (
+								<NoFavoritePlaceholder />
+							) : (
+								<NoFilePlaceholder orgId={orgId} />
+							)
+						) : null}
 					</div>
 				) : (
 					<>
