@@ -11,8 +11,8 @@ const NoFilePlaceholder = ({ orgId }: NoFilePlaceholderProps) => {
 	return (
 		<div className='flex flex-col items-center justify-center gap-6'>
 			<Image
-				className='select-none grid-cols-4'
-				src='/undraw_upload.svg'
+				className='h-72 w-auto select-none grid-cols-4'
+				src='/assets/undraw_upload.svg'
 				alt='an image of people uploading files'
 				width={400}
 				height={400}

@@ -1,7 +1,8 @@
+import { SignInButton, SignedOut } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
-import Header from '@/components/Header';
+import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import ConvexClientProvider from '@/providers/ConvexClientProvider';
 
@@ -22,9 +23,17 @@ export default function RootLayout({
 		<html lang='en'>
 			<body className={inter.className}>
 				<ConvexClientProvider>
-					<Toaster richColors theme='light' />
-					<Header />
+					<SignedOut>
+						<main className='grid h-screen w-screen place-items-center'>
+							<SignInButton>
+								<Button variant='outline'>Sign In</Button>
+							</SignInButton>
+						</main>
+					</SignedOut>
+
 					{children}
+
+					<Toaster richColors theme='light' />
 				</ConvexClientProvider>
 			</body>
 		</html>

@@ -24,17 +24,23 @@ export const FileTypes = v.union(
 );
 
 export default defineSchema({
-	files: defineTable({
-		label: v.string(),
-		storageId: v.id('_storage'),
-		type: FileTypes,
-		orgId: v.string(),
-		authorId: v.string(),
-	}).index('by_org_id', ['orgId']),
 	users: defineTable({
 		tokenIdentifier: v.string(),
 		name: v.string(),
 		imageUrl: v.string(),
 		orgIds: v.array(v.string()),
 	}).index('by_token_identifier', ['tokenIdentifier']),
+	files: defineTable({
+		label: v.string(),
+		storageId: v.id('_storage'),
+		type: FileTypes,
+		orgId: v.string(),
+		authorId: v.id('users'),
+	}).index('by_org_id', ['orgId']),
+	favorites: defineTable({
+		fileId: v.id('files'),
+		userId: v.id('users'),
+	})
+		.index('by_file_id_user_id', ['fileId', 'userId'])
+		.index('by_user_id', ['userId']),
 });

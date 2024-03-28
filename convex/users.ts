@@ -7,7 +7,7 @@ import {
 	query,
 } from './_generated/server';
 
-export const getUser = async (
+export const findUserByTokenIdentifier = async (
 	ctx: QueryCtx | MutationCtx,
 	tokenIdentifier: string,
 ) => {
@@ -44,16 +44,31 @@ export const addOrgIdToUser = internalMutation({
 		tokenIdentifier: v.string(),
 		orgId: v.string(),
 	},
-	async handler(ctx, { tokenIdentifier, orgId }) {
-		const user = await getUser(ctx, tokenIdentifier);
+	async handler(ctx, args) {
+		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
 
 		await ctx.db.patch(user._id, {
-			orgIds: [...user.orgIds, orgId],
+			orgIds: [...new Set([...user.orgIds, args.orgId])],
 		});
 	},
 });
 
-export const getUserById = query({
+export const findUserById = query({
+	args: {
+		id: v.id('users'),
+	},
+	async handler(ctx, args) {
+		const user = await ctx.db.get(args.id);
+
+		if (!user) {
+			throw new ConvexError('User not found');
+		}
+
+		return user;
+	},
+});
+
+export const findUserByAuthId = query({
 	args: {
 		id: v.string(),
 	},
