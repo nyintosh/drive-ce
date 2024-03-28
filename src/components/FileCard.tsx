@@ -1,4 +1,5 @@
 import { useUser } from '@clerk/nextjs';
+import { StarFilledIcon } from '@radix-ui/react-icons';
 import { useMutation, useQuery } from 'convex/react';
 import { EllipsisVertical, ExternalLink, Star, Trash2 } from 'lucide-react';
 import Image from 'next/image';
@@ -55,6 +56,13 @@ const FileCard = ({ file }: FileCardProps) => {
 
 	const isAuthor = userInfo?._id === file.authorId;
 
+	const isFavorited = useQuery(
+		api.files.checkIfFavorited,
+		file._id && userInfo?._id
+			? { fileId: file._id, userId: userInfo?._id }
+			: 'skip',
+	);
+
 	return (
 		<Card>
 			<CardHeader className='p-4'>
@@ -65,7 +73,12 @@ const FileCard = ({ file }: FileCardProps) => {
 							{file.label}
 						</span>
 					</span>
-					<FileAction file={file} isAuthor={isAuthor} />
+
+					<FileAction
+						file={file}
+						isAuthor={isAuthor}
+						isFavorited={!!isFavorited}
+					/>
 				</CardTitle>
 			</CardHeader>
 			<CardContent className='p-4 pt-0'>
@@ -112,9 +125,8 @@ export default FileCard;
 const FileAction = ({
 	file,
 	isAuthor,
-}: FileCardProps & {
-	isAuthor: boolean;
-}) => {
+	isFavorited,
+}: FileCardProps & { isAuthor: boolean; isFavorited: boolean }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const toggleFavorite = useMutation(api.files.toggleFavorite);
@@ -167,7 +179,15 @@ const FileAction = ({
 						onClick={() => toggleFavorite({ fileId: file._id })}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
 					>
-						<Star className='size-4 min-w-4' /> Favorite
+						{isFavorited ? (
+							<>
+								<StarFilledIcon className='size-4 min-w-4' /> Unfavourite
+							</>
+						) : (
+							<>
+								<Star className='size-4 min-w-4' /> Favorite
+							</>
+						)}
 					</DropdownMenuItem>
 					{isAuthor ? (
 						<>

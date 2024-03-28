@@ -144,6 +144,25 @@ export const findAll = query({
 	},
 });
 
+export const checkIfFavorited = query({
+	args: {
+		fileId: v.id('files'),
+		userId: v.id('users'),
+	},
+	async handler(ctx, args) {
+		const { file } = await verifyAccessToFile(ctx, args.fileId);
+
+		const favorite = await ctx.db
+			.query('favorites')
+			.withIndex('by_file_id_user_id', (q) =>
+				q.eq('fileId', file._id).eq('userId', args.userId),
+			)
+			.first();
+
+		return !!favorite;
+	},
+});
+
 export const toggleFavorite = mutation({
 	args: {
 		fileId: v.id('files'),
