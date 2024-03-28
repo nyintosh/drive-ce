@@ -66,16 +66,13 @@ const Home = () => {
 
 								{orgId ? (
 									<UploadFileModal orgId={orgId}>
-										<HardDriveUpload
-											className='aspect-square min-w-4'
-											size={16}
-										/>
+										<HardDriveUpload className='size-4 min-w-4' />
 										Upload
 									</UploadFileModal>
 								) : null}
 							</div>
 
-							<div className='grid grid-cols-4 gap-3 pb-16 pt-6'>
+							<div className='grid grid-cols-4 gap-3 pb-16 pt-4'>
 								{files?.map((file) => <FileCard key={file._id} file={file} />)}
 							</div>
 						</>
@@ -91,10 +88,7 @@ const Home = () => {
 
 							{orgId ? (
 								<UploadFileModal orgId={orgId}>
-									<HardDriveUpload
-										className='aspect-square min-w-4'
-										size={16}
-									/>
+									<HardDriveUpload className='size-4 min-w-4' />
 									Upload
 								</UploadFileModal>
 							) : null}
@@ -102,10 +96,10 @@ const Home = () => {
 
 						{files === undefined ? (
 							<Loader />
-						) : files.length === 0 || true ? (
+						) : files.length === 0 ? (
 							<NotFoundPlaceholder />
 						) : (
-							<div className='grid grid-cols-4 gap-3 pb-16 pt-6'>
+							<div className='grid grid-cols-4 gap-3 pb-16 pt-4'>
 								{files?.map((file) => <FileCard key={file._id} file={file} />)}
 							</div>
 						)}

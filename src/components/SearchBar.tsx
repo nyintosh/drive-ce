@@ -57,7 +57,7 @@ const SearchBar = ({ setQuery, query, className, pending }: SearchBarProps) => {
 				/>
 
 				<Button variant='outline' type='submit' disabled={pending}>
-					<Search className='aspect-square min-w-4' size={16} />
+					<Search className='size-4 min-w-4' />
 				</Button>
 			</form>
 		</Form>

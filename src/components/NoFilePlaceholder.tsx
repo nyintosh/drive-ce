@@ -24,7 +24,7 @@ const NoFilePlaceholder = ({ orgId }: NoFilePlaceholderProps) => {
 			</p>
 
 			<UploadFileModal orgId={orgId}>
-				<HardDriveUpload className='aspect-square min-w-4' size={16} />
+				<HardDriveUpload className='size-4 min-w-4' size={16} />
 				Upload
 			</UploadFileModal>
 		</div>

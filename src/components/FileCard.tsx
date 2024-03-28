@@ -39,99 +39,61 @@ import {
 
 const fileIcons = {
 	audio: (className?: string) => (
-		<Icons.fileAudio
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileAudio className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	bin: (className?: string) => (
-		<Icons.fileBin
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileBin className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	csv: (className?: string) => (
-		<Icons.fileCsv
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileCsv className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	doc: (className?: string) => (
-		<Icons.fileDoc
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileDoc className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	docx: (className?: string) => (
-		<Icons.fileDocx
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileDocx className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	html: (className?: string) => (
-		<Icons.fileHtml
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileHtml className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	image: (className?: string) => (
-		<Icons.fileImage
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileImage className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	json: (className?: string) => (
-		<Icons.fileJson
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileJson className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	pdf: (className?: string) => (
-		<Icons.filePdf
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.filePdf className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	ppt: (className?: string) => (
-		<Icons.fileSlides
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileSlides className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	pptx: (className?: string) => (
-		<Icons.fileSlides
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileSlides className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	rar: (className?: string) => (
-		<Icons.fileZip
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileZip className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	txt: (className?: string) => (
-		<Icons.fileTxt
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileTxt className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	video: (className?: string) => (
-		<Icons.fileVideo
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileVideo className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	xls: (className?: string) => (
-		<Icons.fileXls
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileXls className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	xlsx: (className?: string) => (
-		<Icons.fileXlsx
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileXlsx className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	xml: (className?: string) => (
-		<Icons.fileXml
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileXml className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	zip: (className?: string) => (
-		<Icons.fileZip
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.fileZip className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 	other: (className?: string) => (
-		<Icons.file
-			className={cn(`aspect-square w-4 min-w-4 select-none`, className)}
-		/>
+		<Icons.file className={cn(`size-4 min-w-4 select-none`, className)} />
 	),
 };
 
@@ -164,7 +126,7 @@ const FileCard = ({ file }: FileCardProps) => {
 			<CardContent className='p-4 pt-0'>
 				{file.type === 'image' && file.url ? (
 					<Image
-						className='aspect-video h-auto w-full rounded-md object-cover'
+						className='aspect-video h-auto w-full rounded-md border object-cover shadow-sm'
 						src={file.url}
 						alt={file.label}
 						width={200}
@@ -172,7 +134,7 @@ const FileCard = ({ file }: FileCardProps) => {
 					/>
 				) : (
 					<div className='flex aspect-video h-auto w-full flex-col items-center justify-center gap-1'>
-						{fileIcons[file.type]('scale-[200%]')}
+						{fileIcons[file.type]('size-10')}
 						<span className='text-[0.625rem] font-bold text-gray-400'>
 							{file.type.toUpperCase()}
 						</span>
@@ -182,7 +144,7 @@ const FileCard = ({ file }: FileCardProps) => {
 			<CardFooter className='p-4 pt-0'>
 				<p className='flex items-center gap-2 text-xs'>
 					<div className='flex items-center gap-2'>
-						<Avatar className='h-5 w-5'>
+						<Avatar className='size-5 min-w-5'>
 							<AvatarImage src={author?.imageUrl} alt={author?.name} />
 							<AvatarFallback>{author?.name[0]}</AvatarFallback>
 						</Avatar>
@@ -251,7 +213,7 @@ const FileAction = ({
 
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<EllipsisVertical className='aspect-square min-w-4' size={16} />
+					<EllipsisVertical className='size-4 min-w-4' />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem
@@ -261,14 +223,14 @@ const FileAction = ({
 						}}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
 					>
-						<ExternalLink className='aspect-square min-w-4' size={16} /> Open
+						<ExternalLink className='size-4 min-w-4' /> Open
 					</DropdownMenuItem>
 					{isAuthor ? (
 						<DropdownMenuItem
 							onClick={() => setIsConfirmDialogOpen(true)}
 							className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
 						>
-							<Trash2 className='aspect-square min-w-4' size={16} /> Delete
+							<Trash2 className='size-4 min-w-4' /> Delete
 						</DropdownMenuItem>
 					) : null}
 				</DropdownMenuContent>
