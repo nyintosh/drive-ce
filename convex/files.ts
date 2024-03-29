@@ -173,7 +173,9 @@ export const findAll = query({
 
 		files =
 			args.list === 'trash'
-				? files.filter((file) => file.deleteAt !== undefined)
+				? files
+						.filter((file) => file.deleteAt !== undefined)
+						.sort((a, b) => a.deleteAt! - b.deleteAt!)
 				: files.filter((file) => file.deleteAt === undefined);
 
 		if (args.query) {

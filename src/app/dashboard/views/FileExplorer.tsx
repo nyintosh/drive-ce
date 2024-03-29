@@ -60,7 +60,10 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 									Items in trash will be deleted forever after 30 days
 								</p>
 
-								<Button className='my-1 mr-1 hover:bg-input' variant='ghost'>
+								<Button
+									className='my-1 mr-1 text-xs hover:bg-input'
+									variant='ghost'
+								>
 									Empty trash
 								</Button>
 							</div>
