@@ -169,9 +169,12 @@ export const findAll = query({
 			files = files.filter((file) =>
 				favorites.some((f) => f.fileId === file._id),
 			);
-		} else if (args.list === 'trash') {
-			files = [];
 		}
+
+		files =
+			args.list === 'trash'
+				? files.filter((file) => file.deleteAt !== undefined)
+				: files.filter((file) => file.deleteAt === undefined);
 
 		if (args.query) {
 			files = files.filter((file) =>
@@ -229,6 +232,31 @@ export const toggleFavorite = mutation({
 		} else {
 			await ctx.db.delete(favorites._id);
 		}
+	},
+});
+
+export const markForDelete = mutation({
+	args: {
+		fileId: v.id('files'),
+	},
+	async handler(ctx, args) {
+		const { file } = await verifyIfModerator(ctx, args.fileId);
+
+		await ctx.db.patch(file._id, {
+			deleteAt: Date.now() + 2592000000,
+		});
+	},
+});
+
+export const restore = mutation({
+	args: {
+		fileId: v.id('files'),
+	},
+	async handler(ctx, args) {
+		const { file } = await verifyIfModerator(ctx, args.fileId);
+		await ctx.db.patch(file._id, {
+			deleteAt: undefined,
+		});
 	},
 });
 

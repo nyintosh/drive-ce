@@ -15,6 +15,7 @@ import NoTrashPlaceholder from '@/components/NoTrashPlaceholder';
 import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
 import SearchBar from '@/components/SearchBar';
 import UploadFileModal from '@/components/UploadFileModal';
+import { Button } from '@/components/ui/button';
 
 type FileExplorerTypes = {
 	list?: 'favorites' | 'trash';
@@ -53,22 +54,34 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 					</div>
 				) : (
 					<>
-						<div className='sticky top-0 z-50 flex w-full items-center justify-between pt-8'>
-							<SearchBar
-								setQuery={setSearchQuery}
-								query={searchQuery}
-								pending={files === undefined}
-							/>
+						{list === 'trash' ? (
+							<div className='mt-8 flex items-center justify-between rounded-md bg-secondary pl-4 text-gray-600'>
+								<p className='text-sm'>
+									Items in trash will be deleted forever after 30 days
+								</p>
 
-							{orgId ? (
-								<UploadFileModal orgId={orgId}>
-									<HardDriveUpload className='size-4 min-w-4' />
-									Upload
-								</UploadFileModal>
-							) : null}
-						</div>
+								<Button className='my-1 mr-1 hover:bg-input' variant='ghost'>
+									Empty trash
+								</Button>
+							</div>
+						) : (
+							<div className='sticky top-0 z-50 flex w-full items-center justify-between pt-8'>
+								<SearchBar
+									setQuery={setSearchQuery}
+									query={searchQuery}
+									pending={files === undefined}
+								/>
 
-						<div className='grid grid-cols-4 gap-3 pb-16 pt-4'>
+								{orgId ? (
+									<UploadFileModal orgId={orgId}>
+										<HardDriveUpload className='size-4 min-w-4' />
+										Upload
+									</UploadFileModal>
+								) : null}
+							</div>
+						)}
+
+						<div className='grid grid-cols-4 gap-4 pb-16 pt-4'>
 							{files?.map((file) => <FileCard key={file._id} file={file} />)}
 						</div>
 					</>
@@ -95,7 +108,7 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 					) : files.length === 0 ? (
 						<NotFoundPlaceholder />
 					) : (
-						<div className='grid grid-cols-4 gap-3 pb-16 pt-4'>
+						<div className='grid grid-cols-4 gap-4 pb-16 pt-4'>
 							{files?.map((file) => <FileCard key={file._id} file={file} />)}
 						</div>
 					)}

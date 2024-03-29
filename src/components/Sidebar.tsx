@@ -23,7 +23,7 @@ const Sidebar = () => {
 					) : (
 						<File className='size-4 min-w-4' />
 					)}{' '}
-					Your files
+					Files
 				</Button>
 			</Link>
 

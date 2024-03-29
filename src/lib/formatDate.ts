@@ -14,3 +14,17 @@ export const formatDateOrTimeAgo = (createdAt: Date) => {
 		return formatDistanceToNow(createdAt, { addSuffix: true });
 	}
 };
+
+export const formatTimeLeft = (date: Date) => {
+	const differenceInHours = Math.abs(
+		Math.round((date.getTime() - new Date().getTime()) / (1000 * 3600)),
+	);
+
+	if (differenceInHours > 24) {
+		return `${Math.floor(differenceInHours / 24)} days`;
+	} else if (differenceInHours > 1) {
+		return `${Math.floor(differenceInHours)} hours`;
+	} else {
+		return `less than an hour`;
+	}
+};

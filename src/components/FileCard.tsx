@@ -1,7 +1,14 @@
 import { Protect, useUser } from '@clerk/nextjs';
 import { StarFilledIcon } from '@radix-ui/react-icons';
 import { useMutation, useQuery } from 'convex/react';
-import { EllipsisVertical, ExternalLink, Star, Trash2 } from 'lucide-react';
+import {
+	EllipsisVertical,
+	ExternalLink,
+	Star,
+	Trash,
+	Trash2,
+	Undo,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -9,7 +16,7 @@ import { toast } from 'sonner';
 import { api } from '@convex/_generated/api';
 import { Doc } from '@convex/_generated/dataModel';
 
-import { formatDateOrTimeAgo } from '@/lib/formatDateOrTimeAgo';
+import { formatDateOrTimeAgo, formatTimeLeft } from '@/lib/formatDate';
 import { cn } from '@/lib/utils';
 
 import { Icons } from './Icons';
@@ -64,7 +71,13 @@ const FileCard = ({ file }: FileCardProps) => {
 	);
 
 	return (
-		<Card>
+		<Card className='relative'>
+			{!!file.deleteAt ? (
+				<p className='absolute -bottom-[0.875rem] left-1/2 -z-10 w-max -translate-x-1/2 rounded-b-sm bg-amber-400 px-1.5 pb-0.5 text-[0.5rem]'>
+					{formatTimeLeft(new Date(file.deleteAt))} left to recover
+				</p>
+			) : null}
+
 			<CardHeader className='p-4'>
 				<CardTitle className='flex items-center justify-between'>
 					<span className='flex w-[calc(100%-1.25rem)] items-center gap-2'>
@@ -130,7 +143,42 @@ const FileAction = ({
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const toggleFavorite = useMutation(api.files.toggleFavorite);
-	const remove = useMutation(api.files.remove);
+	const markForDelete = useMutation(api.files.markForDelete);
+	const restore = useMutation(api.files.restore);
+	const hardDelete = useMutation(api.files.remove);
+
+	const handleOpenInNewTab = () => {
+		if (!file.url) return;
+		window.open(file.url, '_blank');
+	};
+
+	const handleToggleFavorite = async () => {
+		await toggleFavorite({ fileId: file._id });
+	};
+
+	const handleMoveToTrash = () => {
+		toast.promise(async () => await markForDelete({ fileId: file._id }), {
+			loading: '',
+			success: 'File moved to trash',
+			error: (error) => error?.data || 'Oops! Something went wrong',
+		});
+	};
+
+	const handleFileRestore = () => {
+		toast.promise(async () => await restore({ fileId: file._id }), {
+			loading: '',
+			success: 'File restored',
+			error: (error) => error?.data || 'Oops! Something went wrong',
+		});
+	};
+
+	const handleHardDelete = () => {
+		toast.promise(async () => await hardDelete({ fileId: file._id }), {
+			loading: '',
+			success: 'File deleted',
+			error: (error) => error?.data || 'Oops! Something went wrong',
+		});
+	};
 
 	return (
 		<>
@@ -146,13 +194,7 @@ const FileAction = ({
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
-							onClick={() => {
-								toast.promise(async () => await remove({ fileId: file._id }), {
-									loading: 'Deleting file...',
-									success: 'File deleted',
-									error: (error) => error?.data || 'Error deleting file',
-								});
-							}}
+							onClick={handleHardDelete}
 							className='bg-red-500 text-white hover:bg-red-600 active:bg-red-400'
 						>
 							Delete
@@ -167,16 +209,13 @@ const FileAction = ({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem
-						onClick={() => {
-							if (!file.url) return;
-							window.open(file.url, '_blank');
-						}}
+						onClick={handleOpenInNewTab}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
 					>
-						<ExternalLink className='size-4 min-w-4' /> Open
+						<ExternalLink className='size-4 min-w-4' /> Open in new tab
 					</DropdownMenuItem>
 					<DropdownMenuItem
-						onClick={() => toggleFavorite({ fileId: file._id })}
+						onClick={handleToggleFavorite}
 						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
 					>
 						{isFavorited ? (
@@ -199,12 +238,29 @@ const FileAction = ({
 					>
 						<>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								onClick={() => setIsDialogOpen(true)}
-								className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
-							>
-								<Trash2 className='size-4 min-w-4' /> Delete
-							</DropdownMenuItem>
+							{!!file.deleteAt ? (
+								<>
+									<DropdownMenuItem
+										onClick={handleFileRestore}
+										className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-cyan-500 focus:text-cyan-600 active:text-cyan-400'
+									>
+										<Undo className='size-4 min-w-4' /> Restore
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => setIsDialogOpen(true)}
+										className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
+									>
+										<Trash2 className='size-4 min-w-4' /> Hard delete
+									</DropdownMenuItem>
+								</>
+							) : (
+								<DropdownMenuItem
+									onClick={handleMoveToTrash}
+									className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
+								>
+									<Trash className='size-4 min-w-4' /> Move to trash
+								</DropdownMenuItem>
+							)}
 						</>
 					</Protect>
 				</DropdownMenuContent>

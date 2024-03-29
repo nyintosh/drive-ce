@@ -47,6 +47,7 @@ export default defineSchema({
 		type: FileTypes,
 		orgId: v.string(),
 		authorId: v.id('users'),
+		deleteAt: v.optional(v.number()),
 	}).index('by_org_id', ['orgId']),
 	favorites: defineTable({
 		fileId: v.id('files'),
