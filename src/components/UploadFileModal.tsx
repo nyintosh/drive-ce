@@ -120,7 +120,7 @@ const UploadFileModal = ({
 			{
 				loading: 'Uploading file...',
 				success: 'File uploaded',
-				error: 'Error uploading file',
+				error: (error) => error?.data || 'Error uploading file',
 				finally: () => {
 					setIsUploading(false);
 					setIsModalOpen(false);

@@ -29,7 +29,7 @@ export const verifyAccessToOrg = async (
 		!user.orgs.find((org) => org.id === orgId) &&
 		!user.tokenIdentifier.includes(orgId)
 	) {
-		throw new ConvexError('You do not have access to this organization');
+		throw new ConvexError("You don't have access to this organization");
 	}
 
 	return { user };
@@ -58,7 +58,7 @@ export const verifyAccessToFile = async (
 		!user.orgs.find((org) => org.id === file.orgId) &&
 		!user.tokenIdentifier.includes(file.orgId)
 	) {
-		throw new ConvexError('You do not have access to this file');
+		throw new ConvexError("You don't have access to this file");
 	}
 
 	return { file, user };
@@ -84,7 +84,7 @@ export const verifyIfAuthor = async (
 	}
 
 	if (file.authorId !== user._id) {
-		throw new ConvexError('You do not have access to this file');
+		throw new ConvexError("You don't have access to this file");
 	}
 
 	return { file, user };
@@ -116,7 +116,7 @@ export const verifyIfModerator = async (
 		org.role !== 'org:moderator' &&
 		file.authorId !== user._id
 	) {
-		throw new ConvexError('You do not have permission to perform this action');
+		throw new ConvexError("You don't have permission for this action");
 	}
 
 	return { file, user };

@@ -40,7 +40,7 @@ export const create = internalMutation({
 	},
 });
 
-export const addOrgIdToUser = internalMutation({
+export const appendOrgToUser = internalMutation({
 	args: {
 		tokenIdentifier: v.string(),
 		orgId: v.string(),
@@ -51,6 +51,36 @@ export const addOrgIdToUser = internalMutation({
 
 		await ctx.db.patch(user._id, {
 			orgs: [...user.orgs, { id: args.orgId, role: args.orgRole }],
+		});
+	},
+});
+
+export const updateOrgInUser = internalMutation({
+	args: {
+		tokenIdentifier: v.string(),
+		orgId: v.string(),
+		orgRole: UserRoles,
+	},
+	async handler(ctx, args) {
+		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
+		await ctx.db.patch(user._id, {
+			orgs: user.orgs.map((org) =>
+				org.id === args.orgId ? { ...org, role: args.orgRole } : org,
+			),
+		});
+	},
+});
+
+export const removeOrgFromUser = internalMutation({
+	args: {
+		tokenIdentifier: v.string(),
+		orgId: v.string(),
+	},
+	async handler(ctx, args) {
+		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
+
+		await ctx.db.patch(user._id, {
+			orgs: user.orgs.filter((org) => org.id !== args.orgId),
 		});
 	},
 });

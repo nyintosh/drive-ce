@@ -34,11 +34,25 @@ http.route({
 					});
 					break;
 				case 'organizationMembership.created':
-					await ctx.runMutation(internal.users.addOrgIdToUser, {
+					await ctx.runMutation(internal.users.appendOrgToUser, {
 						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
-						// @ts-ignore the types are wrong in the node_module
+						// @ts-ignore the types are not sync in the node_module
 						orgRole: result.data.role,
+					});
+					break;
+				case 'organizationMembership.updated':
+					await ctx.runMutation(internal.users.updateOrgInUser, {
+						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+						orgId: result.data.organization.id,
+						// @ts-ignore the types are not sync in the node_module
+						orgRole: result.data.role,
+					});
+					break;
+				case 'organizationMembership.deleted':
+					await ctx.runMutation(internal.users.removeOrgFromUser, {
+						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+						orgId: result.data.organization.id,
 					});
 					break;
 			}

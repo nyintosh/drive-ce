@@ -150,7 +150,7 @@ const FileAction = ({
 								toast.promise(async () => await remove({ fileId: file._id }), {
 									loading: 'Deleting file...',
 									success: 'File deleted',
-									error: 'Error deleting file',
+									error: (error) => error?.data || 'Error deleting file',
 								});
 							}}
 							className='bg-red-500 text-white hover:bg-red-600 active:bg-red-400'
