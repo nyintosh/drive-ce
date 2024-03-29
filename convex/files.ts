@@ -93,6 +93,7 @@ export const verifyIfAuthor = async (
 export const verifyIfModerator = async (
 	ctx: QueryCtx | MutationCtx,
 	fileId: Id<'files'>,
+	excludeAuthor?: boolean,
 ) => {
 	const identity = await ctx.auth.getUserIdentity();
 	if (!identity) {
@@ -107,14 +108,11 @@ export const verifyIfModerator = async (
 	const { user } = await verifyAccessToOrg(ctx, file.orgId);
 
 	const org = user.orgs.find((org) => org.id === file.orgId);
-	if (!org) {
-		throw new ConvexError('Unexpected error occurred');
-	}
 
 	if (
-		org.role !== 'org:admin' &&
-		org.role !== 'org:moderator' &&
-		file.authorId !== user._id
+		org?.role !== 'org:admin' && org?.role !== 'org:moderator' && excludeAuthor
+			? true
+			: file.authorId !== user._id
 	) {
 		throw new ConvexError("You don't have permission for this action");
 	}
@@ -269,5 +267,41 @@ export const remove = mutation({
 	async handler(ctx, args) {
 		const { file } = await verifyIfModerator(ctx, args.fileId);
 		await ctx.db.delete(file._id);
+		await ctx.storage.delete(file.storageId);
+	},
+});
+
+export const clearTrash = mutation({
+	args: {
+		orgId: v.string(),
+		fileIds: v.array(v.id('files')),
+	},
+	async handler(ctx, args) {
+		await verifyAccessToOrg(ctx, args.orgId);
+
+		let skipCount = 0;
+
+		await Promise.all(
+			args.fileIds.map(async (fileId) => {
+				const file = await ctx.db.get(fileId);
+
+				if (!file) {
+					skipCount++;
+					return;
+				}
+
+				if (file.deleteAt === undefined) {
+					skipCount++;
+					return;
+				}
+
+				if (file) {
+					await ctx.db.delete(file._id);
+					await ctx.storage.delete(file.storageId);
+				}
+			}),
+		);
+
+		return { skipCount };
 	},
 });
