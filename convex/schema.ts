@@ -23,12 +23,23 @@ export const FileTypes = v.union(
 	v.literal('other'),
 );
 
+export const UserRoles = v.union(
+	v.literal('org:admin'),
+	v.literal('org:moderator'),
+	v.literal('org:member'),
+);
+
 export default defineSchema({
 	users: defineTable({
 		tokenIdentifier: v.string(),
 		name: v.string(),
 		imageUrl: v.string(),
-		orgIds: v.array(v.string()),
+		orgs: v.array(
+			v.object({
+				id: v.string(),
+				role: UserRoles,
+			}),
+		),
 	}).index('by_token_identifier', ['tokenIdentifier']),
 	files: defineTable({
 		label: v.string(),

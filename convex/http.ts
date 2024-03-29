@@ -37,6 +37,8 @@ http.route({
 					await ctx.runMutation(internal.users.addOrgIdToUser, {
 						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
+						// @ts-ignore the types are wrong in the node_module
+						orgRole: result.data.role,
 					});
 					break;
 			}

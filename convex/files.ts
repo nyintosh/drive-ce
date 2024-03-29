@@ -25,7 +25,10 @@ export const verifyAccessToOrg = async (
 
 	const user = await findUserByTokenIdentifier(ctx, identity.tokenIdentifier);
 
-	if (!user.orgIds.includes(orgId) && !user.tokenIdentifier.includes(orgId)) {
+	if (
+		!user.orgs.find((org) => org.id === orgId) &&
+		!user.tokenIdentifier.includes(orgId)
+	) {
 		throw new ConvexError('You do not have access to this organization');
 	}
 
@@ -52,7 +55,7 @@ export const verifyAccessToFile = async (
 	}
 
 	if (
-		!user.orgIds.includes(file.orgId) &&
+		!user.orgs.find((org) => org.id === file.orgId) &&
 		!user.tokenIdentifier.includes(file.orgId)
 	) {
 		throw new ConvexError('You do not have access to this file');
@@ -82,6 +85,38 @@ export const verifyIfAuthor = async (
 
 	if (file.authorId !== user._id) {
 		throw new ConvexError('You do not have access to this file');
+	}
+
+	return { file, user };
+};
+
+export const verifyIfModerator = async (
+	ctx: QueryCtx | MutationCtx,
+	fileId: Id<'files'>,
+) => {
+	const identity = await ctx.auth.getUserIdentity();
+	if (!identity) {
+		throw new ConvexError('Unauthorized');
+	}
+
+	const file = await ctx.db.get(fileId);
+	if (!file) {
+		throw new ConvexError('File not found');
+	}
+
+	const { user } = await verifyAccessToOrg(ctx, file.orgId);
+
+	const org = user.orgs.find((org) => org.id === file.orgId);
+	if (!org) {
+		throw new ConvexError('Unexpected error occurred');
+	}
+
+	if (
+		org.role !== 'org:admin' &&
+		org.role !== 'org:moderator' &&
+		file.authorId !== user._id
+	) {
+		throw new ConvexError('You do not have permission to perform this action');
 	}
 
 	return { file, user };
@@ -193,7 +228,7 @@ export const remove = mutation({
 		fileId: v.id('files'),
 	},
 	async handler(ctx, args) {
-		const { file } = await verifyIfAuthor(ctx, args.fileId);
+		const { file } = await verifyIfModerator(ctx, args.fileId);
 		await ctx.db.delete(file._id);
 	},
 });

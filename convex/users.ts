@@ -6,6 +6,7 @@ import {
 	internalMutation,
 	query,
 } from './_generated/server';
+import { UserRoles } from './schema';
 
 export const findUserByTokenIdentifier = async (
 	ctx: QueryCtx | MutationCtx,
@@ -34,7 +35,7 @@ export const create = internalMutation({
 	async handler(ctx, args) {
 		await ctx.db.insert('users', {
 			...args,
-			orgIds: [],
+			orgs: [],
 		});
 	},
 });
@@ -43,12 +44,13 @@ export const addOrgIdToUser = internalMutation({
 	args: {
 		tokenIdentifier: v.string(),
 		orgId: v.string(),
+		orgRole: UserRoles,
 	},
 	async handler(ctx, args) {
 		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
 
 		await ctx.db.patch(user._id, {
-			orgIds: [...new Set([...user.orgIds, args.orgId])],
+			orgs: [...user.orgs, { id: args.orgId, role: args.orgRole }],
 		});
 	},
 });

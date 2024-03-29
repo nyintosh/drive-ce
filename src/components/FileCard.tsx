@@ -1,4 +1,4 @@
-import { useUser } from '@clerk/nextjs';
+import { Protect, useUser } from '@clerk/nextjs';
 import { StarFilledIcon } from '@radix-ui/react-icons';
 import { useMutation, useQuery } from 'convex/react';
 import { EllipsisVertical, ExternalLink, Star, Trash2 } from 'lucide-react';
@@ -189,7 +189,14 @@ const FileAction = ({
 							</>
 						)}
 					</DropdownMenuItem>
-					{isAuthor ? (
+
+					<Protect
+						condition={(has) =>
+							has({ role: 'org:admin' }) ||
+							has({ role: 'org:moderator' }) ||
+							isAuthor
+						}
+					>
 						<>
 							<DropdownMenuSeparator />
 							<DropdownMenuItem
@@ -199,7 +206,7 @@ const FileAction = ({
 								<Trash2 className='size-4 min-w-4' /> Delete
 							</DropdownMenuItem>
 						</>
-					) : null}
+					</Protect>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</>
