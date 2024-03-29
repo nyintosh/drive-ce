@@ -142,33 +142,42 @@ export const createFile = mutation({
 	},
 });
 
+export const ListTypes = v.optional(
+	v.union(v.literal('favorites'), v.literal('trash')),
+);
+
 export const findAll = query({
 	args: {
 		orgId: v.string(),
-		isFavorite: v.optional(v.boolean()),
+		list: ListTypes,
 		query: v.optional(v.string()),
 	},
 	async handler(ctx, args) {
 		const { user } = await verifyAccessToOrg(ctx, args.orgId);
 
-		const favorites = await ctx.db
-			.query('favorites')
-			.withIndex('by_user_id', (q) => q.eq('userId', user._id))
+		let files = await ctx.db
+			.query('files')
+			.withIndex('by_org_id', (q) => q.eq('orgId', args.orgId))
 			.collect();
 
-		let files = (
-			await ctx.db
-				.query('files')
-				.withIndex('by_org_id', (q) => q.eq('orgId', args.orgId))
-				.collect()
-		).filter((file) => {
-			if (!args.query) return file;
-			return file.label.toLowerCase().includes(args.query.toLowerCase());
-		});
+		if (args.list === 'favorites') {
+			const favorites = await ctx.db
+				.query('favorites')
+				.withIndex('by_user_id', (q) => q.eq('userId', user._id))
+				.collect();
 
-		files = args.isFavorite
-			? files.filter((file) => favorites.some((f) => f.fileId === file._id))
-			: files;
+			files = files.filter((file) =>
+				favorites.some((f) => f.fileId === file._id),
+			);
+		} else if (args.list === 'trash') {
+			files = [];
+		}
+
+		if (args.query) {
+			files = files.filter((file) =>
+				file.label.toLowerCase().includes(args.query!.toLowerCase()),
+			);
+		}
 
 		return Promise.all(
 			files.map(async (file) => ({

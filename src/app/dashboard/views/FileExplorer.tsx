@@ -11,15 +11,16 @@ import FileCard from '@/components/FileCard';
 import Loader from '@/components/Loader';
 import NoFavoritePlaceholder from '@/components/NoFavoritePlaceholder';
 import NoFilePlaceholder from '@/components/NoFilePlaceholder';
+import NoTrashPlaceholder from '@/components/NoTrashPlaceholder';
 import NotFoundPlaceholder from '@/components/NotFoundPlaceholder';
 import SearchBar from '@/components/SearchBar';
 import UploadFileModal from '@/components/UploadFileModal';
 
 type FileExplorerTypes = {
-	isFavorite?: boolean;
+	list?: 'favorites' | 'trash';
 };
 
-const FileExplorer = ({ isFavorite }: FileExplorerTypes) => {
+const FileExplorer = ({ list }: FileExplorerTypes) => {
 	const [searchQuery, setSearchQuery] = useState('');
 
 	const { organization } = useOrganization();
@@ -28,7 +29,7 @@ const FileExplorer = ({ isFavorite }: FileExplorerTypes) => {
 	const orgId = organization?.id ?? user?.id;
 	const files = useQuery(
 		api.files.findAll,
-		orgId ? { orgId, isFavorite, query: searchQuery } : 'skip',
+		orgId ? { orgId, list, query: searchQuery } : 'skip',
 	);
 
 	useEffect(() => {
@@ -43,8 +44,8 @@ const FileExplorer = ({ isFavorite }: FileExplorerTypes) => {
 				) : files.length === 0 ? (
 					<div className='flex flex-col items-center justify-center gap-6 pt-24'>
 						{orgId ? (
-							isFavorite ? (
-								<NoFavoritePlaceholder />
+							list ? (
+								EmptyPlaceHolder[list]
 							) : (
 								<NoFilePlaceholder orgId={orgId} />
 							)
@@ -105,3 +106,8 @@ const FileExplorer = ({ isFavorite }: FileExplorerTypes) => {
 };
 
 export default FileExplorer;
+
+const EmptyPlaceHolder = {
+	favorites: <NoFavoritePlaceholder />,
+	trash: <NoTrashPlaceholder />,
+};

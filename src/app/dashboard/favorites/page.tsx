@@ -1,7 +1,7 @@
 import FileExplorer from '../views/FileExplorer';
 
 const Favorite = () => {
-	return <FileExplorer isFavorite={true} />;
+	return <FileExplorer list='favorites' />;
 };
 
 export default Favorite;

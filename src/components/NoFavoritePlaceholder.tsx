@@ -15,7 +15,7 @@ const NoFavoritePlaceholder = () => {
 				height={400}
 			/>
 
-			<p className='text-lg text-gray-400'>
+			<p className='max-w-96 text-center text-gray-500'>
 				Looks like your favorites list is feeling a bit empty. Time to add
 				something special!
 			</p>

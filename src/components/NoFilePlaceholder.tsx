@@ -18,7 +18,7 @@ const NoFilePlaceholder = ({ orgId }: NoFilePlaceholderProps) => {
 				height={400}
 			/>
 
-			<p className='text-lg text-gray-400'>
+			<p className='max-w-96 text-center text-gray-500'>
 				Looks like this space could use some company! Time to spice things up
 				with some files!
 			</p>

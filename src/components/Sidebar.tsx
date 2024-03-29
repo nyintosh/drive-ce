@@ -1,7 +1,7 @@
 'use client';
 
 import { StarFilledIcon } from '@radix-ui/react-icons';
-import { File, Files, Star } from 'lucide-react';
+import { File, Files, Star, Trash, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -38,6 +38,20 @@ const Sidebar = () => {
 						<Star className='size-4 min-w-4' />
 					)}{' '}
 					Favorites
+				</Button>
+			</Link>
+
+			<Link href='/dashboard/trash'>
+				<Button
+					className='flex w-full items-center justify-start gap-2'
+					variant={isActive('/dashboard/trash') ? 'secondary' : 'ghost'}
+				>
+					{isActive('/dashboard/trash') ? (
+						<Trash2 className='size-4 min-w-4' />
+					) : (
+						<Trash className='size-4 min-w-4' />
+					)}{' '}
+					Trash
 				</Button>
 			</Link>
 		</div>
