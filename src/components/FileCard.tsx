@@ -70,13 +70,19 @@ const FileCard = ({ file }: FileCardProps) => {
 			: 'skip',
 	);
 
+	const deleteBy = useQuery(
+		api.users.findUserById,
+		file.deleteBy ? { id: file.deleteBy } : 'skip',
+	);
+
 	return (
 		<Card className='relative'>
-			{!!file.deleteAt ? (
+			{!!file.scheduleDeleteAt && (
 				<p className='absolute -bottom-[0.875rem] left-1/2 -z-10 w-max -translate-x-1/2 rounded-b-sm bg-amber-400 px-1.5 pb-0.5 text-[0.5rem]'>
-					{formatTimeLeft(new Date(file.deleteAt))} left to recover
+					{deleteBy?._id === userInfo?._id ? 'You' : deleteBy?.name} •{' '}
+					{formatTimeLeft(new Date(file.scheduleDeleteAt))} left to recover
 				</p>
-			) : null}
+			)}
 
 			<CardHeader className='p-4'>
 				<CardTitle className='flex items-center justify-between'>
@@ -91,6 +97,7 @@ const FileCard = ({ file }: FileCardProps) => {
 						file={file}
 						isAuthor={isAuthor}
 						isFavorited={!!isFavorited}
+						isTrash={!!deleteBy}
 					/>
 				</CardTitle>
 			</CardHeader>
@@ -135,11 +142,18 @@ const FileCard = ({ file }: FileCardProps) => {
 
 export default FileCard;
 
+type FileActionProps = {
+	isAuthor: boolean;
+	isFavorited: boolean;
+	isTrash: boolean;
+} & FileCardProps;
+
 const FileAction = ({
 	file,
 	isAuthor,
 	isFavorited,
-}: FileCardProps & { isAuthor: boolean; isFavorited: boolean }) => {
+	isTrash,
+}: FileActionProps) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const toggleFavorite = useMutation(api.files.toggleFavorite);
@@ -214,20 +228,22 @@ const FileAction = ({
 					>
 						<ExternalLink className='size-4 min-w-4' /> Open in new tab
 					</DropdownMenuItem>
-					<DropdownMenuItem
-						onClick={handleToggleFavorite}
-						className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
-					>
-						{isFavorited ? (
-							<>
-								<StarFilledIcon className='size-4 min-w-4' /> Unfavourite
-							</>
-						) : (
-							<>
-								<Star className='size-4 min-w-4' /> Favorite
-							</>
-						)}
-					</DropdownMenuItem>
+					{!isTrash && (
+						<DropdownMenuItem
+							onClick={handleToggleFavorite}
+							className='flex cursor-pointer items-center gap-2 pl-3 pr-4'
+						>
+							{isFavorited ? (
+								<>
+									<StarFilledIcon className='size-4 min-w-4' /> Unfavourite
+								</>
+							) : (
+								<>
+									<Star className='size-4 min-w-4' /> Favorite
+								</>
+							)}
+						</DropdownMenuItem>
+					)}
 
 					<Protect
 						condition={(has) =>
@@ -238,7 +254,7 @@ const FileAction = ({
 					>
 						<>
 							<DropdownMenuSeparator />
-							{!!file.deleteAt ? (
+							{isTrash ? (
 								<>
 									<DropdownMenuItem
 										onClick={handleFileRestore}
@@ -250,7 +266,7 @@ const FileAction = ({
 										onClick={() => setIsDialogOpen(true)}
 										className='flex cursor-pointer items-center gap-2 pl-3 pr-4 text-red-500 focus:text-red-600 active:text-red-400'
 									>
-										<Trash2 className='size-4 min-w-4' /> Hard delete
+										<Trash2 className='size-4 min-w-4' /> Delete now
 									</DropdownMenuItem>
 								</>
 							) : (

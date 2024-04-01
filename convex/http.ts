@@ -23,35 +23,42 @@ http.route({
 			});
 
 			const generateName = (firstName: string, lastName: string) =>
-				(!!lastName ? firstName + ' ' + lastName : firstName).trim();
+				`${firstName.trim()} ${lastName.trim()}`.trim();
 
 			switch (result.type) {
 				case 'user.created':
 					await ctx.runMutation(internal.users.create, {
-						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.id}`,
+						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+						name: generateName(result.data.first_name, result.data.last_name),
+						imageUrl: result.data.image_url,
+					});
+					break;
+				case 'user.updated':
+					await ctx.runMutation(internal.users.update, {
+						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.id}`,
 						name: generateName(result.data.first_name, result.data.last_name),
 						imageUrl: result.data.image_url,
 					});
 					break;
 				case 'organizationMembership.created':
 					await ctx.runMutation(internal.users.appendOrgToUser, {
-						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
-						// @ts-ignore the types are not sync in the node_module
+						// @ts-ignore new types are not sync in the node_module
 						orgRole: result.data.role,
 					});
 					break;
 				case 'organizationMembership.updated':
 					await ctx.runMutation(internal.users.updateOrgInUser, {
-						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
-						// @ts-ignore the types are not sync in the node_module
+						// @ts-ignore new types are not sync in the node_module
 						orgRole: result.data.role,
 					});
 					break;
 				case 'organizationMembership.deleted':
 					await ctx.runMutation(internal.users.removeOrgFromUser, {
-						tokenIdentifier: `https://lasting-troll-75.clerk.accounts.dev|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
 					});
 					break;

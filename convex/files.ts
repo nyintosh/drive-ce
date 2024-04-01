@@ -1,7 +1,13 @@
 import { ConvexError, v } from 'convex/values';
 
 import { Id } from './_generated/dataModel';
-import { MutationCtx, QueryCtx, mutation, query } from './_generated/server';
+import {
+	MutationCtx,
+	QueryCtx,
+	internalMutation,
+	mutation,
+	query,
+} from './_generated/server';
 import { FileTypes } from './schema';
 import { findUserByTokenIdentifier } from './users';
 
@@ -93,7 +99,6 @@ export const verifyIfAuthor = async (
 export const verifyIfModerator = async (
 	ctx: QueryCtx | MutationCtx,
 	fileId: Id<'files'>,
-	excludeAuthor?: boolean,
 ) => {
 	const identity = await ctx.auth.getUserIdentity();
 	if (!identity) {
@@ -110,15 +115,44 @@ export const verifyIfModerator = async (
 	const org = user.orgs.find((org) => org.id === file.orgId);
 
 	if (
-		org?.role !== 'org:admin' && org?.role !== 'org:moderator' && excludeAuthor
-			? true
-			: file.authorId !== user._id
+		org?.role !== 'org:admin' &&
+		org?.role !== 'org:moderator' &&
+		file.authorId !== user._id
 	) {
 		throw new ConvexError("You don't have permission for this action");
 	}
 
 	return { file, user };
 };
+
+export const scheduleDelete = internalMutation({
+	args: {},
+	async handler(ctx) {
+		const files = (await ctx.db.query('files').collect()).filter(
+			(file) => file.scheduleDeleteAt !== undefined,
+		);
+
+		await Promise.all(
+			files
+				.filter((file) => Date.now() >= file.scheduleDeleteAt!)
+				.map(async (file) => {
+					await ctx.storage.delete(file.storageId);
+					await ctx.db.delete(file._id);
+
+					const favoriteId = (
+						await ctx.db
+							.query('favorites')
+							.withIndex('by_file_id', (q) => q.eq('fileId', file._id))
+							.first()
+					)?._id;
+
+					if (favoriteId) {
+						await ctx.db.delete(favoriteId);
+					}
+				}),
+		);
+	},
+});
 
 export const createFile = mutation({
 	args: {
@@ -240,10 +274,12 @@ export const markForDelete = mutation({
 		fileId: v.id('files'),
 	},
 	async handler(ctx, args) {
-		const { file } = await verifyIfModerator(ctx, args.fileId);
+		const { file, user } = await verifyIfModerator(ctx, args.fileId);
 
 		await ctx.db.patch(file._id, {
-			deleteAt: Date.now() + 2592000000,
+			deleteAt: Date.now(),
+			scheduleDeleteAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+			deleteBy: user._id,
 		});
 	},
 });
@@ -256,6 +292,8 @@ export const restore = mutation({
 		const { file } = await verifyIfModerator(ctx, args.fileId);
 		await ctx.db.patch(file._id, {
 			deleteAt: undefined,
+			scheduleDeleteAt: undefined,
+			deleteBy: undefined,
 		});
 	},
 });
@@ -266,8 +304,20 @@ export const remove = mutation({
 	},
 	async handler(ctx, args) {
 		const { file } = await verifyIfModerator(ctx, args.fileId);
-		await ctx.db.delete(file._id);
+
 		await ctx.storage.delete(file.storageId);
+		await ctx.db.delete(file._id);
+
+		const favoriteId = (
+			await ctx.db
+				.query('favorites')
+				.withIndex('by_file_id', (q) => q.eq('fileId', file._id))
+				.first()
+		)?._id;
+
+		if (favoriteId) {
+			await ctx.db.delete(favoriteId);
+		}
 	},
 });
 
@@ -290,14 +340,25 @@ export const clearTrash = mutation({
 					return;
 				}
 
-				if (file.deleteAt === undefined) {
+				if (file.scheduleDeleteAt === undefined) {
 					skipCount++;
 					return;
 				}
 
 				if (file) {
-					await ctx.db.delete(file._id);
 					await ctx.storage.delete(file.storageId);
+					await ctx.db.delete(file._id);
+
+					const favoriteId = (
+						await ctx.db
+							.query('favorites')
+							.withIndex('by_file_id', (q) => q.eq('fileId', file._id))
+							.first()
+					)?._id;
+
+					if (favoriteId) {
+						await ctx.db.delete(favoriteId);
+					}
 				}
 			}),
 		);

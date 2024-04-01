@@ -48,11 +48,14 @@ export default defineSchema({
 		orgId: v.string(),
 		authorId: v.id('users'),
 		deleteAt: v.optional(v.number()),
+		scheduleDeleteAt: v.optional(v.number()),
+		deleteBy: v.optional(v.id('users')),
 	}).index('by_org_id', ['orgId']),
 	favorites: defineTable({
 		fileId: v.id('files'),
 		userId: v.id('users'),
 	})
 		.index('by_file_id_user_id', ['fileId', 'userId'])
+		.index('by_file_id', ['fileId'])
 		.index('by_user_id', ['userId']),
 });

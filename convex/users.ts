@@ -40,6 +40,18 @@ export const create = internalMutation({
 	},
 });
 
+export const update = internalMutation({
+	args: {
+		tokenIdentifier: v.string(),
+		name: v.string(),
+		imageUrl: v.string(),
+	},
+	async handler(ctx, args) {
+		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
+		await ctx.db.patch(user._id, args);
+	},
+});
+
 export const appendOrgToUser = internalMutation({
 	args: {
 		tokenIdentifier: v.string(),

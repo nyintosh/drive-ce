@@ -69,13 +69,12 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 					<Loader />
 				) : files.length === 0 ? (
 					<div className='flex flex-col items-center justify-center gap-6 pt-24'>
-						{orgId ? (
-							list ? (
+						{orgId &&
+							(list ? (
 								EmptyPlaceHolder[list]
 							) : (
 								<NoFilePlaceholder orgId={orgId} />
-							)
-						) : null}
+							))}
 					</div>
 				) : (
 					<>
@@ -135,12 +134,12 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 									pending={files === undefined}
 								/>
 
-								{orgId ? (
+								{orgId && (
 									<UploadFileModal orgId={orgId}>
 										<HardDriveUpload className='size-4 min-w-4' />
 										Upload
 									</UploadFileModal>
-								) : null}
+								)}
 							</div>
 						)}
 
@@ -158,12 +157,12 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 							pending={files === undefined}
 						/>
 
-						{orgId ? (
+						{orgId && (
 							<UploadFileModal orgId={orgId}>
 								<HardDriveUpload className='size-4 min-w-4' />
 								Upload
 							</UploadFileModal>
-						) : null}
+						)}
 					</div>
 
 					{files === undefined ? (
