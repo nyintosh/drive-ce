@@ -32,8 +32,9 @@ export const UserRoles = v.union(
 export default defineSchema({
 	users: defineTable({
 		tokenIdentifier: v.string(),
+		email: v.string(),
 		name: v.string(),
-		imageUrl: v.string(),
+		imageUrl: v.optional(v.string()),
 		orgs: v.array(
 			v.object({
 				id: v.string(),

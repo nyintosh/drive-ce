@@ -29,8 +29,9 @@ export const findUserByTokenIdentifier = async (
 export const create = internalMutation({
 	args: {
 		tokenIdentifier: v.string(),
+		email: v.string(),
 		name: v.string(),
-		imageUrl: v.string(),
+		imageUrl: v.optional(v.string()),
 	},
 	async handler(ctx, args) {
 		await ctx.db.insert('users', {
@@ -43,12 +44,23 @@ export const create = internalMutation({
 export const update = internalMutation({
 	args: {
 		tokenIdentifier: v.string(),
+		email: v.string(),
 		name: v.string(),
-		imageUrl: v.string(),
+		imageUrl: v.optional(v.string()),
 	},
 	async handler(ctx, args) {
 		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
 		await ctx.db.patch(user._id, args);
+	},
+});
+
+export const remove = internalMutation({
+	args: {
+		tokenIdentifier: v.string(),
+	},
+	async handler(ctx, args) {
+		const user = await findUserByTokenIdentifier(ctx, args.tokenIdentifier);
+		await ctx.db.delete(user._id);
 	},
 });
 
@@ -120,10 +132,7 @@ export const findUserByAuthId = query({
 		const user = await ctx.db
 			.query('users')
 			.withIndex('by_token_identifier', (q) =>
-				q.eq(
-					'tokenIdentifier',
-					`https://lasting-troll-75.clerk.accounts.dev|${args.id}`,
-				),
+				q.eq('tokenIdentifier', `${process.env.CLERK_HOSTNAME}|${args.id}`),
 			)
 			.first();
 

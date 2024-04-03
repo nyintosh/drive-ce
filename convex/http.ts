@@ -16,9 +16,9 @@ http.route({
 			const result = await ctx.runAction(internal.clerk.fulfill, {
 				payload: payloadString,
 				headers: {
-					'svix-id': headerPayload.get('svix-id')!,
-					'svix-timestamp': headerPayload.get('svix-timestamp')!,
-					'svix-signature': headerPayload.get('svix-signature')!,
+					'svix-id': headerPayload.get('svix-id'),
+					'svix-signature': headerPayload.get('svix-signature'),
+					'svix-timestamp': headerPayload.get('svix-timestamp'),
 				},
 			});
 
@@ -28,21 +28,28 @@ http.route({
 			switch (result.type) {
 				case 'user.created':
 					await ctx.runMutation(internal.users.create, {
-						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+						email: result.data.email_addresses[0].email_address,
 						name: generateName(result.data.first_name, result.data.last_name),
 						imageUrl: result.data.image_url,
 					});
 					break;
 				case 'user.updated':
 					await ctx.runMutation(internal.users.update, {
-						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+						email: result.data.email_addresses[0].email_address,
 						name: generateName(result.data.first_name, result.data.last_name),
 						imageUrl: result.data.image_url,
 					});
 					break;
+				case 'user.deleted':
+					await ctx.runMutation(internal.users.remove, {
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.id}`,
+					});
+					break;
 				case 'organizationMembership.created':
 					await ctx.runMutation(internal.users.appendOrgToUser, {
-						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
 						// @ts-ignore new types are not sync in the node_module
 						orgRole: result.data.role,
@@ -50,7 +57,7 @@ http.route({
 					break;
 				case 'organizationMembership.updated':
 					await ctx.runMutation(internal.users.updateOrgInUser, {
-						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
 						// @ts-ignore new types are not sync in the node_module
 						orgRole: result.data.role,
@@ -58,7 +65,7 @@ http.route({
 					break;
 				case 'organizationMembership.deleted':
 					await ctx.runMutation(internal.users.removeOrgFromUser, {
-						tokenIdentifier: `https://${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
+						tokenIdentifier: `${process.env.CLERK_HOSTNAME}|${result.data.public_user_data.user_id}`,
 						orgId: result.data.organization.id,
 					});
 					break;

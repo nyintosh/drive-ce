@@ -36,8 +36,8 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	const { organization } = useOrganization();
 	const { user } = useUser();
+	const { organization } = useOrganization();
 
 	const orgId = organization?.id ?? user?.id;
 	const files = useQuery(
