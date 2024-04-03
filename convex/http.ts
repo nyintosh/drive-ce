@@ -23,7 +23,7 @@ http.route({
 			});
 
 			const generateName = (firstName: string, lastName: string) =>
-				`${firstName.trim()} ${lastName.trim()}`.trim();
+				(!!lastName ? firstName + ' ' + lastName : firstName).trim();
 
 			switch (result.type) {
 				case 'user.created':
