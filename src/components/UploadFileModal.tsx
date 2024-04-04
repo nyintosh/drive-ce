@@ -1,8 +1,7 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery } from 'convex/react';
+import { useMutation } from 'convex/react';
 import { CloudUpload, Loader2 } from 'lucide-react';
 import { ChangeEvent, PropsWithChildren, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -30,6 +29,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useAppContext } from '@/providers/AppContextProvider';
 import { getFileFormat } from '@/utils/get-file-format';
 
 const formSchema = z.object({
@@ -56,14 +56,10 @@ const UploadFileModal = ({
 	orgId,
 	className,
 }: UploadFileModalProps) => {
+	const { signedUser } = useAppContext();
+
 	const [isUploading, setIsUploading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
-
-	const { user } = useUser();
-	const userInfo = useQuery(
-		api.users.findUserByAuthId,
-		user?.id ? { id: user.id } : 'skip',
-	);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -93,7 +89,7 @@ const UploadFileModal = ({
 	const handleFileUpload = (values: z.infer<typeof formSchema>) => {
 		toast.promise(
 			async () => {
-				if (!user || !userInfo) {
+				if (!signedUser) {
 					throw new Error('Unauthorized');
 				}
 
@@ -114,7 +110,7 @@ const UploadFileModal = ({
 					storageId,
 					type: getFileFormat(fileType),
 					orgId,
-					authorId: userInfo._id,
+					authorId: signedUser._id,
 				});
 			},
 			{

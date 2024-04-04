@@ -1,15 +1,8 @@
-import { useUser } from '@clerk/nextjs';
 import { useQuery } from 'convex/react';
 import Image from 'next/image';
 
 import { api } from '@convex/_generated/api';
 import { Doc } from '@convex/_generated/dataModel';
-
-import {
-	formatHourLeft,
-	formatRelativeOrDistanceToNow,
-} from '@/lib/formatDate';
-import { cn } from '@/lib/utils';
 
 import { FileActions } from '@/components/FileActions';
 import { Icons } from '@/components/Icons';
@@ -21,27 +14,27 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card';
+import {
+	formatHourLeft,
+	formatRelativeOrDistanceToNow,
+} from '@/lib/formatDate';
+import { cn } from '@/lib/utils';
+import { useAppContext } from '@/providers/AppContextProvider';
 
 type FileCardProps = {
 	file: Doc<'files'> & { url: string | null };
 };
 
 const FileCard = ({ file }: FileCardProps) => {
-	const { user } = useUser();
+	const { signedUser } = useAppContext();
 
 	const author = useQuery(api.users.findUserById, { id: file.authorId });
-	const userInfo = useQuery(
-		api.users.findUserByAuthId,
-		user?.id ? { id: user.id } : 'skip',
-	);
 
-	const isAuthor = userInfo?._id === file.authorId;
+	const isAuthor = signedUser?._id === file.authorId;
 
 	const isFavorited = useQuery(
 		api.files.checkIfFavorited,
-		file._id && userInfo?._id
-			? { fileId: file._id, userId: userInfo?._id }
-			: 'skip',
+		signedUser?._id ? { fileId: file._id, userId: signedUser?._id } : 'skip',
 	);
 
 	const deleteBy = useQuery(
@@ -53,7 +46,7 @@ const FileCard = ({ file }: FileCardProps) => {
 		<Card className='relative'>
 			{!!file.scheduleDeleteAt && (
 				<p className='absolute -bottom-[0.875rem] left-1/2 -z-10 w-max -translate-x-1/2 rounded-b-sm bg-amber-400 px-1.5 pb-0.5 text-[0.5rem]'>
-					{deleteBy?._id === userInfo?._id ? 'You' : deleteBy?.name} •{' '}
+					{deleteBy?._id === signedUser?._id ? 'You' : deleteBy?.name} •{' '}
 					{file.scheduleDeleteAt >= Date.now() ? (
 						<>
 							{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover

@@ -1,6 +1,5 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from 'convex/react';
 import Image from 'next/image';
@@ -14,6 +13,7 @@ import {
 	formatHourLeft,
 	formatRelativeOrDistanceToNow,
 } from '@/lib/formatDate';
+import { useAppContext } from '@/providers/AppContextProvider';
 
 import { fileIcons } from '../FileCard';
 
@@ -70,15 +70,11 @@ const AuthorCell = ({
 }: {
 	file: Doc<'files'> & { url: string | null };
 }) => {
-	const { user } = useUser();
+	const { signedUser } = useAppContext();
 
 	const author = useQuery(api.users.findUserById, { id: file.authorId });
-	const userInfo = useQuery(
-		api.users.findUserByAuthId,
-		user?.id ? { id: user.id } : 'skip',
-	);
 
-	const isAuthor = userInfo?._id === file.authorId;
+	const isAuthor = signedUser?._id === file.authorId;
 
 	return (
 		<div className='flex items-center gap-2'>
@@ -96,12 +92,7 @@ const UploadedAtCell = ({
 }: {
 	file: Doc<'files'> & { url: string | null };
 }) => {
-	const { user } = useUser();
-
-	const userInfo = useQuery(
-		api.users.findUserByAuthId,
-		user?.id ? { id: user.id } : 'skip',
-	);
+	const { signedUser } = useAppContext();
 
 	const deleteBy = useQuery(
 		api.users.findUserById,
@@ -116,7 +107,7 @@ const UploadedAtCell = ({
 
 			{!!file.scheduleDeleteAt && (
 				<p className='absolute -bottom-0 left-2 line-clamp-1 h-3 w-max max-w-[calc(100%-1rem)] rounded-t-sm bg-amber-400 px-1 text-[0.5rem] leading-3'>
-					{deleteBy?._id === userInfo?._id ? 'You' : deleteBy?.name} •{' '}
+					{deleteBy?._id === signedUser?._id ? 'You' : deleteBy?.name} •{' '}
 					{file.scheduleDeleteAt >= Date.now() ? (
 						<>
 							{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover
@@ -135,20 +126,13 @@ const ActionsCell = ({
 }: {
 	file: Doc<'files'> & { url: string | null };
 }) => {
-	const { user } = useUser();
+	const { signedUser } = useAppContext();
 
-	const userInfo = useQuery(
-		api.users.findUserByAuthId,
-		user?.id ? { id: user.id } : 'skip',
-	);
-
-	const isAuthor = userInfo?._id === file.authorId;
+	const isAuthor = signedUser?._id === file.authorId;
 
 	const isFavorited = useQuery(
 		api.files.checkIfFavorited,
-		file._id && userInfo?._id
-			? { fileId: file._id, userId: userInfo?._id }
-			: 'skip',
+		signedUser?._id ? { fileId: file._id, userId: signedUser?._id } : 'skip',
 	);
 
 	const deleteBy = useQuery(
