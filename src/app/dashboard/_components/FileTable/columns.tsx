@@ -117,7 +117,13 @@ const UploadedAtCell = ({
 			{!!file.scheduleDeleteAt && (
 				<p className='absolute -bottom-0 left-2 line-clamp-1 h-3 w-max max-w-[calc(100%-1rem)] rounded-t-sm bg-amber-400 px-1 text-[0.5rem] leading-3'>
 					{deleteBy?._id === userInfo?._id ? 'You' : deleteBy?.name} •{' '}
-					{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover
+					{file.scheduleDeleteAt >= Date.now() ? (
+						<>
+							{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover
+						</>
+					) : (
+						<span>will be deleted at any moment</span>
+					)}
 				</p>
 			)}
 		</div>

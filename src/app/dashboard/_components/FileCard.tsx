@@ -54,7 +54,13 @@ const FileCard = ({ file }: FileCardProps) => {
 			{!!file.scheduleDeleteAt && (
 				<p className='absolute -bottom-[0.875rem] left-1/2 -z-10 w-max -translate-x-1/2 rounded-b-sm bg-amber-400 px-1.5 pb-0.5 text-[0.5rem]'>
 					{deleteBy?._id === userInfo?._id ? 'You' : deleteBy?.name} •{' '}
-					{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover
+					{file.scheduleDeleteAt >= Date.now() ? (
+						<>
+							{formatHourLeft(new Date(file.scheduleDeleteAt))} left to recover
+						</>
+					) : (
+						<span>will be deleted at any moment</span>
+					)}
 				</p>
 			)}
 
