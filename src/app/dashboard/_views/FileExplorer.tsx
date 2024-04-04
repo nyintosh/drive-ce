@@ -3,7 +3,7 @@
 import { Protect, useOrganization, useUser } from '@clerk/nextjs';
 import { useMutation, useQuery } from 'convex/react';
 import { Grid, HardDriveUpload, Table } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { api } from '@convex/_generated/api';
@@ -28,8 +28,16 @@ import {
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAppContext } from '@/providers/AppContextProvider';
+import { AppContextData, useAppContext } from '@/providers/AppContextProvider';
+import { capitalize } from '@/utils/capitalize';
 
 import { columns } from '../_components/FileTable/columns';
 import { DataTable } from '../_components/FileTable/data-table';
@@ -196,36 +204,65 @@ const TabsView = ({
 }) => {
 	const { setExplorerView, explorerView } = useAppContext();
 
+	const [filter, setFilter] = useState<Doc<'files'>['type'] | undefined>();
+
+	const handleOnFilterChange = (value: string) => {
+		setFilter(value !== 'all' ? (value as Doc<'files'>['type']) : undefined);
+	};
+
+	const _files = useMemo(() => {
+		if (!filter) return files;
+		return files.filter((file) => file.type === filter);
+	}, [files, filter]);
+
 	return (
-		<Tabs defaultValue={explorerView} className='pb-[4.25rem] pt-4'>
-			<TabsList>
-				<TabsTrigger
-					onClick={() => setExplorerView('grid')}
-					className='flex items-center gap-1'
-					value='grid'
-				>
-					<Grid className='size-4 min-w-4' />
-					<span>Grid</span>
-				</TabsTrigger>
-				<TabsTrigger
-					onClick={() => setExplorerView('table')}
-					className='flex items-center gap-1'
-					value='table'
-				>
-					<Table className='size-4 min-w-4' />
-					<span>Table</span>
-				</TabsTrigger>
-			</TabsList>
+		<Tabs
+			onValueChange={(value) => {
+				setExplorerView(value as AppContextData['explorerView']);
+			}}
+			defaultValue={explorerView}
+			className='pb-[4.25rem]'
+		>
+			<div className='flex items-start justify-between pt-4'>
+				<TabsList>
+					<TabsTrigger className='flex items-center gap-1' value='grid'>
+						<Grid className='size-4 min-w-4' />
+						<span>Grid</span>
+					</TabsTrigger>
+					<TabsTrigger className='flex items-center gap-1' value='table'>
+						<Table className='size-4 min-w-4' />
+						<span>Table</span>
+					</TabsTrigger>
+				</TabsList>
+
+				<div>
+					<Select onValueChange={handleOnFilterChange} defaultValue={filter}>
+						<SelectTrigger className='w-[180px]'>
+							<SelectValue placeholder='All' />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value='all'>All</SelectItem>
+							{[...new Set(files.map((file) => file.type))]
+								.toSorted()
+								.map((type) => (
+									<SelectItem key={type} value={type}>
+										{capitalize(type)}
+									</SelectItem>
+								))}
+						</SelectContent>
+					</Select>
+				</div>
+			</div>
 
 			<TabsContent className='mt-4' value='grid'>
 				<div className='grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4'>
-					{files.map((file) => (
+					{_files.map((file) => (
 						<FileCard key={file._id} file={file} />
 					))}
 				</div>
 			</TabsContent>
 			<TabsContent className='mt-4' value='table'>
-				<DataTable columns={columns} data={files} />
+				<DataTable columns={columns} data={_files} />
 			</TabsContent>
 		</Tabs>
 	);
