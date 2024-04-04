@@ -1,4 +1,4 @@
-import FileExplorer from './views/FileExplorer';
+import FileExplorer from './_views/FileExplorer';
 
 const Dashboard = () => {
 	return <FileExplorer />;

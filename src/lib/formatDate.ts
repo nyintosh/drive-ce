@@ -1,6 +1,6 @@
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, formatRelative } from 'date-fns';
 
-export const formatDateOrTimeAgo = (createdAt: Date) => {
+export const formatRelativeOrDistanceToNow = (createdAt: Date) => {
 	const currentDate = new Date();
 	const differenceInDays = Math.abs(
 		Math.round(
@@ -9,13 +9,13 @@ export const formatDateOrTimeAgo = (createdAt: Date) => {
 	);
 
 	if (differenceInDays > 1) {
-		return format(createdAt, 'MMM dd, yyyy');
+		return formatRelative(createdAt, currentDate);
 	} else {
 		return formatDistanceToNow(createdAt, { addSuffix: true });
 	}
 };
 
-export const formatTimeLeft = (date: Date) => {
+export const formatHourLeft = (date: Date) => {
 	const differenceInHours = Math.abs(
 		Math.round((date.getTime() - new Date().getTime()) / (1000 * 3600)),
 	);

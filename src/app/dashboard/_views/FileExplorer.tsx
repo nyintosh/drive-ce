@@ -2,13 +2,14 @@
 
 import { Protect, useOrganization, useUser } from '@clerk/nextjs';
 import { useMutation, useQuery } from 'convex/react';
-import { HardDriveUpload } from 'lucide-react';
+import { Grid, HardDriveUpload, Table } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { api } from '@convex/_generated/api';
+import { Doc } from '@convex/_generated/dataModel';
 
-import FileCard from '@/components/FileCard';
+import FileCard from '@/app/dashboard/_components/FileCard';
 import Loader from '@/components/Loader';
 import NoFavoritePlaceholder from '@/components/NoFavoritePlaceholder';
 import NoFilePlaceholder from '@/components/NoFilePlaceholder';
@@ -27,6 +28,10 @@ import {
 	AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { columns } from '../_components/FileTable/columns';
+import { DataTable } from '../_components/FileTable/data-table';
 
 type FileExplorerTypes = {
 	list?: 'favorites' | 'trash';
@@ -143,9 +148,7 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 							</div>
 						)}
 
-						<div className='grid grid-cols-4 gap-4 pb-16 pt-4'>
-							{files?.map((file) => <FileCard key={file._id} file={file} />)}
-						</div>
+						<TabsView files={files} />
 					</>
 				)
 			) : (
@@ -170,9 +173,7 @@ const FileExplorer = ({ list }: FileExplorerTypes) => {
 					) : files.length === 0 ? (
 						<NotFoundPlaceholder />
 					) : (
-						<div className='grid grid-cols-4 gap-4 pb-16 pt-4'>
-							{files?.map((file) => <FileCard key={file._id} file={file} />)}
-						</div>
+						<TabsView files={files} />
 					)}
 				</>
 			)}
@@ -185,4 +186,36 @@ export default FileExplorer;
 const EmptyPlaceHolder = {
 	favorites: <NoFavoritePlaceholder />,
 	trash: <NoTrashPlaceholder />,
+};
+
+const TabsView = ({
+	files,
+}: {
+	files: (Doc<'files'> & { url: string | null })[];
+}) => {
+	return (
+		<Tabs defaultValue='grid' className='pb-[4.25rem] pt-4'>
+			<TabsList>
+				<TabsTrigger className='flex items-center gap-1' value='grid'>
+					<Grid className='size-4 min-w-4' />
+					<span>Grid</span>
+				</TabsTrigger>
+				<TabsTrigger className='flex items-center gap-1' value='table'>
+					<Table className='size-4 min-w-4' />
+					<span>Table</span>
+				</TabsTrigger>
+			</TabsList>
+
+			<TabsContent className='mt-4' value='grid'>
+				<div className='grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4'>
+					{files.map((file) => (
+						<FileCard key={file._id} file={file} />
+					))}
+				</div>
+			</TabsContent>
+			<TabsContent className='mt-4' value='table'>
+				<DataTable columns={columns} data={files} />
+			</TabsContent>
+		</Tabs>
+	);
 };
