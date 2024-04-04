@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
+import AppContextProvider from '@/providers/AppContextProvider';
 import ConvexClientProvider from '@/providers/ConvexClientProvider';
 
 import './globals.css';
@@ -23,15 +24,17 @@ export default function RootLayout({
 		<html lang='en'>
 			<body className={inter.className}>
 				<ConvexClientProvider>
-					<SignedOut>
-						<main className='grid h-screen w-screen place-items-center'>
-							<SignInButton>
-								<Button variant='outline'>Sign In</Button>
-							</SignInButton>
-						</main>
-					</SignedOut>
+					<AppContextProvider>
+						<SignedOut>
+							<main className='grid h-screen w-screen place-items-center'>
+								<SignInButton>
+									<Button variant='outline'>Sign In</Button>
+								</SignInButton>
+							</main>
+						</SignedOut>
 
-					{children}
+						{children}
+					</AppContextProvider>
 
 					<Toaster richColors theme='light' />
 				</ConvexClientProvider>

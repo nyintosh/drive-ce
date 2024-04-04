@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAppContext } from '@/providers/AppContextProvider';
 
 import { columns } from '../_components/FileTable/columns';
 import { DataTable } from '../_components/FileTable/data-table';
@@ -193,14 +194,24 @@ const TabsView = ({
 }: {
 	files: (Doc<'files'> & { url: string | null })[];
 }) => {
+	const { setExplorerView, explorerView } = useAppContext();
+
 	return (
-		<Tabs defaultValue='grid' className='pb-[4.25rem] pt-4'>
+		<Tabs defaultValue={explorerView} className='pb-[4.25rem] pt-4'>
 			<TabsList>
-				<TabsTrigger className='flex items-center gap-1' value='grid'>
+				<TabsTrigger
+					onClick={() => setExplorerView('grid')}
+					className='flex items-center gap-1'
+					value='grid'
+				>
 					<Grid className='size-4 min-w-4' />
 					<span>Grid</span>
 				</TabsTrigger>
-				<TabsTrigger className='flex items-center gap-1' value='table'>
+				<TabsTrigger
+					onClick={() => setExplorerView('table')}
+					className='flex items-center gap-1'
+					value='table'
+				>
 					<Table className='size-4 min-w-4' />
 					<span>Table</span>
 				</TabsTrigger>
