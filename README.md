@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DRIVE-CE (Google Drive Clone)
 
-## Getting Started
+## Description
 
-First, run the development server:
+DRIVE-CE is a simplified clone of Google Drive, created with Next.js, TypeScript, Convex, and Clerk. It aims to replicate the core features of Google Drive in a straightforward manner.
+
+## Features
+
+- Authentication
+- Organizations
+- File Upload
+- Role Based Authorization
+- Trash Functionality
+
+## Table of Contents
+
+- [Tech Stack](#tech-stack)
+- [Installation](#installation)
+- [Important](#important)
+- [Environment Variables](#environment-variables)
+- [Starting the Development Server](#starting-the-development-server)
+- [Contributing](#contributing)
+- [Live Preview](#live-preview)
+
+## Tech Stack
+
+- Next.js
+- Tailwind CSS
+- TypeScript
+- Clerk
+- Convex
+
+## Installation
+
+Make sure you have Node.js installed on your machine.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/nyintosh/drive-ce.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd drive-ce
+```
+
+Install dependencies:
+Run one of the following commands based on your preferred package manager:
+
+- Using npm:
+
+```bash
+npm install
+```
+
+- Using yarn:
+
+```bash
+yarn install
+```
+
+- Using pnpm:
+
+```bash
+pnpm install
+```
+
+## Important
+
+Additionally, you need to set up projects in Convex and Clerk to run this locally.
+
+## Environment Variables
+
+This project requires the following environment variables:
+
+- `NEXT_PUBLIC_CONVEX_URL`
+- `CONVEX_DEPLOYMENT`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `CLERK_WEBHOOK_SECRET`
+
+Make sure to set these environment variables in your development environment.
+
+## Starting the Development Server
+
+To start the development server:
+Run one of the following commands based on your preferred package manager:
+
+- Using npm:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Using yarn:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Using pnpm:
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open your browser and navigate to http://localhost:3000 to see the app live.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+We welcome contributions! If you'd like to contribute to GEMINI-CE, please follow these guidelines:
 
-## Deploy on Vercel
+- Fork the repository
+- Create a new branch
+- Make your changes
+- Submit a pull request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Live Preview
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You can preview the live version of the project at [https://drive-ce.vercel.app](https://drive-ce.vercel.app).
