@@ -82,7 +82,7 @@ This project requires the following environment variables:
 
 Make sure to set these environment variables in your development environment.
 
-#### Additionally, you need to set these environment variables in Convex:
+> Additionally, you need to set these environment variables in Convex:
 
 - `CLERK_HOSTNAME`
 - `CLERK_WEBHOOK_SECRET`
