@@ -69,19 +69,23 @@ pnpm install
 
 ## Important
 
-Additionally, you need to set up projects in Convex and Clerk to run this locally.
+To run this locally, ensure you have set up projects in Convex and Clerk, and configured webhooks accordingly.
 
 ## Environment Variables
 
 This project requires the following environment variables:
 
-- `NEXT_PUBLIC_CONVEX_URL`
 - `CONVEX_DEPLOYMENT`
+- `NEXT_PUBLIC_CONVEX_URL`
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 - `CLERK_SECRET_KEY`
-- `CLERK_WEBHOOK_SECRET`
 
 Make sure to set these environment variables in your development environment.
+
+#### Additionally, you need to set these environment variables in Convex:
+
+- `CLERK_HOSTNAME`
+- `CLERK_WEBHOOK_SECRET`
 
 ## Starting the Development Server
 
