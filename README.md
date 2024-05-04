@@ -1,4 +1,4 @@
-# DRIVE-CE (Google Drive Clone)
+# DRIVE (CE)
 
 ## Description
 
@@ -114,7 +114,7 @@ Open your browser and navigate to http://localhost:3000 to see the app live.
 
 ## Contributing
 
-We welcome contributions! If you'd like to contribute to GEMINI-CE, please follow these guidelines:
+If you want to add additional features and improvements, we welcome contributions! Please follow these guidelines:
 
 - Fork the repository
 - Create a new branch
