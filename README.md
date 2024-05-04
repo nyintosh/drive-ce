@@ -2,7 +2,7 @@
 
 ## Description
 
-DRIVE-CE is a simplified clone of Google Drive, created with Next.js, TypeScript, Convex, and Clerk. It aims to replicate the core features of Google Drive in a straightforward manner.
+A simplified version of Google Drive, created with Next.js, TypeScript, Convex, and Clerk. It aims to replicate the core features of Google Drive in a straightforward manner.
 
 ## Features
 
@@ -37,7 +37,7 @@ Make sure you have Node.js installed on your machine.
 Clone the repository:
 
 ```bash
-git clone https://github.com/nyintosh/drive-ce.git
+git version of https://github.com/nyintosh/drive-ce.git
 ```
 
 Navigate to the project directory:
