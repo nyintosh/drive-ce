@@ -1,5 +1,7 @@
 # DRIVE (CE)
 
+<img width="1408" alt="SCR-20240703-khcm" src="https://github.com/nyintosh/drive-ce/assets/56629705/c793c2e7-34cf-4a64-b724-94dc6a642593">
+
 ## Description
 
 A simplified version of Google Drive, created with Next.js, TypeScript, Convex, and Clerk. It aims to replicate the core features of Google Drive in a straightforward manner.
